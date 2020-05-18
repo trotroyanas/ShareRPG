@@ -5,4 +5,10 @@
  */
 body {
   padding-top: 56px;
+  background-color: #f2f3f7;
+  font-family: Poppins, Helvetica, "sans-serif";
+}
+
+.bg-blue {
+  background-color: #3699ff !important;
 }

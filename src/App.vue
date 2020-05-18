@@ -1,28 +1,52 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Start Bootstrap</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+          aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <router-link class="nav-link" to="/">Home</router-link> |
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/about">About</router-link> |
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/contact">Contact</router-link> |
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <router-view/>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
-
-export default Vue.extend({
-  name: "App",
-  components: {
-    HelloWorld
-  }
-});
-</script>
-
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+#navbarResponsive {
+  a:focus {
+    font-weight: bold;
+    &.router-link-exact-active {
+      color: #FFF;
+    }
+  }
+
+  a:visited {
+      font-weight: normal;
+      color: #626d77;
+
+  }
+
+
 }
 </style>
