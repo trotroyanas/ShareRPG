@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 html,
 body,
 section {
@@ -5,6 +9,9 @@ section {
     height: 100%;
     margin: 0;
     padding: 0;
+    background-color: #F2F3F7;
+    font-family: 'Poppins', sans-serif, Helvetica;
+    font-size: 16px;
 }
 
 .site {
@@ -14,12 +21,12 @@ section {
     grid-template-columns: 1fr 8fr 1fr;
     grid-gap: 5px;
     grid-template-areas:
-        "sidebar1 header sidebar2"
+        "header header header"
         "sidebar1 content sidebar2"
         "footer footer footer";
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 800px) {
     .site {
         grid-template-rows: 1fr;
         grid-template-columns: 1fr;
@@ -28,7 +35,6 @@ section {
             "header"
             "content"
             "footer";
-
     }
 
     .sidebar1 {
@@ -40,7 +46,6 @@ section {
     }
 }
 
-
 .header {
     grid-area: header;
     background: #ff0000;
@@ -48,7 +53,15 @@ section {
     position: sticky;
     top: 0;
     padding: 10px;
+    font-size: 12px;
 }
+
+.container {
+    width: 50%;
+    background-color: blue;
+    justify-self: center;
+}
+
 
 .content {
     grid-area: content;
@@ -62,7 +75,7 @@ section {
 .sidebar1 {
     grid-area: sidebar1;
     background: #F2F3F7;
-    border: solid 0px #777;
+    border: solid 1px #777;
     justify-self: start;
     padding: 20px;
 }
@@ -71,7 +84,7 @@ section {
 .sidebar2 {
     grid-area: sidebar2;
     background: #F2F3F7;
-    border: solid 0px #777;
+    border: solid 1px #777;
     justify-self: start;
     padding: 20px;
 }
@@ -81,4 +94,5 @@ section {
     background: #ccc;
     border: solid 1px #999;
     padding: 20px;
+    font-size: 12px;
 }

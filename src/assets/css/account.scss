@@ -1,0 +1,65 @@
+$col1: #ccc;
+
+.zzz {
+    margin-top: 50px;
+    min-height: calc(100vh -60px);
+}
+
+.form-account {
+
+    font-size: 16px;
+    border: solid 1px $col1;
+    max-width: 1024px;
+    min-width: 300px;
+    margin: auto;
+    padding: 40px;
+    font-size: 16px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.form-account-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    border-bottom: solid 1px #D7DBDF;
+    margin-bottom: 30px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    border: solid 1px #d2d6db;
+    border-radius: 6px;
+    font-size: 16px;
+    padding: 14px 10px;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(297px, 1fr));
+    grid-gap: 24px;
+    grid-template-rows: 1fr 1fr;
+}
+
+.btn.btn-primary {
+    align-items: center;
+    background-color: #5850EB;
+    align-items: center;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    padding: 15px 25px;
+    border-radius: 6px;
+}
+
+.form-account .btn.btn-primary {
+    grid-column-end: -1;
+}
