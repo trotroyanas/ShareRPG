@@ -115,9 +115,11 @@ export default Vue.extend({
           body: nuser
         })
         .then(r => {
+          console.log("Retour");
           console.log(r.data);
         })
         .catch(e => {
+          console.log("Catch Error");
           console.log(e);
         });
     }

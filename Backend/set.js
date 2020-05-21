@@ -8,9 +8,6 @@ let serviceAccount = require('./sharerpg-772e6-f9609743f0e5.json');
 function ApiSet(req) {
     return new Promise((reject, resolve) => {
         try {
-            console.log("myrecept");
-            console.log(req.body);
-
             try {
                 let db = admin.firestore();
             } catch {
@@ -24,8 +21,6 @@ function ApiSet(req) {
             const user = uuidv4();
             let docRef = db.collection('users').doc(user);
 
-
-
             let dat = {
                 "id": user,
                 "email": req.body.email,
@@ -37,9 +32,18 @@ function ApiSet(req) {
             console.log("objet");
             console.log(dat);
 
-            let setAda = docRef.set(dat)
+            //let setAda = 
+            docRef.set(dat)
+                .then(e => {
+                    console.log("success");
+                    resolve(dat)
+                })
+                .catch(err => {
+                    console.log("error");
+                    throw err;
+                    //reject(err)
+                })
 
-            resolve(dat)
         } catch (err) {
             console.log(err);
             reject(err)
