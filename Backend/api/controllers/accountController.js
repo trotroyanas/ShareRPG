@@ -6,12 +6,14 @@ let serviceAccount = require('../config/sharerpg-firebase.json')
 const User = require("../models/User.json");
 const crypto = require("crypto-js");
 
+//Encodage SH256
 function EncPwd(pw) {
   const hash = crypto.SHA256(pw);
   const npwd = hash.toString(crypto.enc.Base64)
   return npwd;
 }
 
+// connexion DB //
 function CnxDB() {
   let db = null;
   try {
@@ -25,8 +27,62 @@ function CnxDB() {
   return db;
 }
 
-exports.accountAdd = (req, res) => {
+// Check email //
+async function EmailExist(email) {
   try {
+    let er = {
+      status: 0,
+      detail: {}
+    }
+
+    //Cnx BDD
+    let db = await CnxDB();
+    let docRef = await db.collection('users');
+
+    await docRef.where('email', '==', email).get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          //console.log("email non trouvé");
+          er.status = 0
+          er.detail = "email not found"
+        } else {
+          snapshot.forEach(doc => {
+            console.log(doc.id, '=>', doc.data());
+          });
+          er.status = 1
+          er.detail = "email already exist"
+        }
+      })
+    //console.log("fin :" + Ret);
+    return er;
+  } catch (err) {
+    let er = {
+      status: 1,
+      detail: err
+    }
+    console.log(er)
+    return er;
+  }
+}
+
+
+exports.Add = async (req, res) => {
+  try {
+
+    let er = {
+      status: 0,
+      detail: {}
+    }
+
+    const emExist = await EmailExist(req.body.email)
+    //console.log(emExist);
+
+    if (emExist.status === 1) {
+      er = emExist;
+      console.log(er)
+      res.status(500).json(er);
+      return
+    }
 
     //recupère les chammps du modèle
     let nUser = User;
@@ -41,22 +97,17 @@ exports.accountAdd = (req, res) => {
     let db = CnxDB();
 
     const uuid = uuidv4();
-    let docRef = db.collection('users').doc(uuid);
-
-    let er = {
-      status: 0,
-      detail: {}
-    }
+    let docRef = await db.collection('users').doc(uuid);
     docRef.set(nUser)
       .then(e => {
-        console.log("success");
+        console.log("success : ");
         er.detail = {
           ...nUser,
           id: uuid
         }
         //console.log(er);
         //console.log("fin");
-        res.status(200).json(er)
+        res.status(200).send(er)
       })
       .catch(err => {
         er.status = 1;
@@ -71,46 +122,61 @@ exports.accountAdd = (req, res) => {
     res.status(500).json(er);
   }
 }
-/* 
-exports.accountAdd = async (req, res) => {
+
+exports.Del = async (req, res) => {
   try {
-    const post = new Blog({
-      title: req.body.title,
-      content: req.body.content,
-      category: req.body.category,
-      author: req.body.author
-    });
-    let newPost = await post.save();
-    res.status(200).json({
-      data: newPost
-    });
+    let db = CnxDB();
+    let deleteDoc = await db.collection('users').doc(req.params.userId).delete();
+    let er = {
+      status: 0,
+      detail: req.params.userId
+    }
+    console.log("userId:" + req.params.userId + " deleted.");
+    res.status(200).json(er);
   } catch (err) {
-    res.status(500).json({
-      error: err
-    });
+    let er = {
+      status: 1,
+      detail: err
+    }
+    res.status(500).json(er);
   }
 };
 
-exports.deleteBlogPost = async (req, res) => {
+exports.Put = async (req, res) => {
   try {
-    const id = req.params.blogId;
-    let result = await Blog.remove({
-      _id: id
-    });
-    res.status(200).json(result);
+    console.log("iuserId:" + req.params.userId);
+    console.log(req.body);
+    let db = CnxDB();
+    let updDoc = await db.collection('users').doc(req.params.userId);
+    let upd = updDoc.update(req.body)
+    let er = {
+      status: 0,
+      detail: req.body
+    }
+    //console.log("userId:" + req.params.userId + " deleted.");
+    res.status(200).json(er);
   } catch (err) {
-    res.status(500).json(err);
-  }
-}; 
-
-exports.updateBlogPost = async (req, res) => {
-  try {
-    const id = req.params.blogId;
-    let result = await Blog.findByIdAndUpdate(id, req.body);
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json(err);
+    let er = {
+      status: 1,
+      detail: err
+    }
+    res.status(500).json(er);
   }
 };
 
-*/
+
+
+exports.Check = async (req, res) => {
+  try {
+    const emExist = await EmailExist(req.body.email)
+    res.status(200).json(emExist)
+    return
+  } catch (err) {
+    let er = {
+      status: 1,
+      detail: err
+    }
+    res.status(500).json(er);
+    return
+  }
+};
