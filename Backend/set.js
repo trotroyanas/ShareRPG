@@ -2,7 +2,7 @@ const admin = require('firebase-admin');
 const {
     v4: uuidv4
 } = require('uuid');
-let serviceAccount = require('./keys/sharerpg-772e6-96916b968962.json');
+let serviceAccount = require('./keys/sharerpg-firebase.json');
 
 
 function ApiSet(req) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="zzz">
+  <div class="form-account-marge">
     <div class="form-account">
       <div class="form-account-title">Add Account</div>
       <form
@@ -105,11 +105,11 @@ export default Vue.extend({
         progressBar: true,
         positionClass: "toast-top-right",
         preventDuplicates: false,
-        onclick: null,
-        showDuration: "300",
-        hideDuration: "1000",
-        timeOut: "5000",
-        extendedTimeOut: "1000",
+        //onclick: null,
+        showDuration: 300,
+        hideDuration: 1000,
+        timeOut: 5000,
+        extendedTimeOut: 1000,
         showEasing: "swing",
         hideEasing: "linear",
         showMethod: "fadeIn",
@@ -138,6 +138,8 @@ export default Vue.extend({
       const urlVer = "http://localhost:3000/api/VerifyAccount";
       const urlSet = "http://localhost:3000/api/set";
 
+      toastr.options = this.toastrOptions;
+
       axios
         .post(urlVer, {
           email: nuser.email
@@ -154,7 +156,6 @@ export default Vue.extend({
               .then(r => {
                 if (r.data.status === 0) {
                   console.log(r.data.detail);
-                  toastr.options = this.toastrOptions;
                   toastr["success"]("Add Account", "Success");
 
                   //Reset les champs du formulaire sur success
@@ -169,7 +170,6 @@ export default Vue.extend({
                 console.log(e);
               });
           } else {
-            toastr.options = this.toastrOptions;
             toastr["error"](r.data.detail, "Error");
           }
         })

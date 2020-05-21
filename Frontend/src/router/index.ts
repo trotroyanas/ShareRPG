@@ -4,6 +4,9 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
 import Contact from '../views/Contact.vue'
 import Account from '../views/account.vue'
+import Login from '../views/login.vue'
+
+
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
@@ -30,6 +33,12 @@ const routes: Array<RouteConfig> = [
     path: '/account',
     name: 'Account',
     component: Account
+  }
+  ,
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
   }
 
 ]

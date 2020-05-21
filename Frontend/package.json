@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@types/crypto-js": "^3.1.46",
+    "@types/toastr": "^2.1.38",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
     "crypto-js": "^4.0.0",
