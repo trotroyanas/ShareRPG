@@ -1,46 +1,33 @@
-const express = require('express')
-const app = express()
-const apiset = require('./set.js')
-const apiVer = require('./VerifyAccount.js')
+const express = require("express");
+const PORT = process.env.PORT || 3000;
+const morgan = require("morgan");
+const cors = require("cors");
 const bodyParser = require("body-parser");
-const cors = require('cors');
+//const config = require("./config/sharerpg-firebase.json");
+const app = express();
 
 
-app.use(bodyParser.json(), cors());
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+
+//configure database and mongoose
+//registering cors
+app.use(cors());
+//configure body parser
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+app.use(bodyParser.json());
+//configure body-parser ends here
+app.use(morgan("dev")); // configire morgan
+// define first route
+
+app.get("/", (req, res) => {
+  res.json("Hola Svelte Developers...Shall we fight??");
 });
 
 
-app.post('/', function (req, res) {
-    console.log(req.body);
-    res.send('Hello World')
-})
+const account = require("./api/routes/account.js");
+app.use("/api/account", account);
 
-app.post('/api/VerifyAccount', function (req, res) {
-    //    console.log("toto");
-    //    console.log(req.body);
-    apiVer.ApiVerifAccount(req.body).then((r) => {
-        console.log("retour verify");
-        console.log(r);
-        res.send(r)
-    }).catch(err => {
-        console.log("retour verify error");
-        console.log(err);
-        res.send(err)
-    })
-})
-
-
-app.post('/api/set', function (req, res) {
-    apiset.ApiSet(req.body).then((r) => {
-        res.send(r)
-    }).catch(err => {
-        //console.log(err);
-        res.send(err)
-    })
-})
-
-app.listen(3000)
+app.listen(PORT, () => {
+  console.log(`App is running on ${PORT}`);
+});
