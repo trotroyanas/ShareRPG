@@ -2,7 +2,13 @@
   <div class="zzz">
     <div class="form-account">
       <div class="form-account-title">Add Account</div>
-      <form class="form-grid" method="post" action="/api/account/add" @submit="checkForm">
+      <form
+        class="form-grid"
+        id="Form-AddAccount"
+        method="post"
+        action="/api/account/add"
+        @submit="checkForm"
+      >
         <div class="form-group">
           <label for="email">Email</label>
           <input
@@ -71,12 +77,14 @@
 
 <style lang="scss" rel="stylesheet">
 @import "../assets/css/account.scss";
+@import "../assets/css/toastr.min.css";
 </style>
 
 <script lang="ts">
 import axios from "axios";
 import Vue from "vue";
 import crypto from "crypto-js";
+import toastr from "toastr";
 
 export default Vue.extend({
   name: "Account",
@@ -89,6 +97,23 @@ export default Vue.extend({
         prenom: "Ch.",
         password: "sdevknseozen",
         passwordConfirm: "sdevknseozen"
+      },
+      toastrOptions: {
+        closeButton: false,
+        debug: false,
+        newestOnTop: true,
+        progressBar: true,
+        positionClass: "toast-top-right",
+        preventDuplicates: false,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        timeOut: "5000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut"
       }
     };
   },
@@ -99,6 +124,7 @@ export default Vue.extend({
       return npwd;
     },
     checkForm(e: any) {
+      //empêche le clic->send du formulaire
       e.preventDefault();
 
       const nuser = {
@@ -109,21 +135,50 @@ export default Vue.extend({
         password: this.EncPwd(this.user.password)
       };
 
-      const url = "http://localhost:3000/api/set";
+      const urlVer = "http://localhost:3000/api/VerifyAccount";
+      const urlSet = "http://localhost:3000/api/set";
+
       axios
-        .post(url, {
-          body: nuser
+        .post(urlVer, {
+          email: nuser.email
         })
         .then(r => {
-          console.log("Retour");
+          console.log("retour");
           console.log(r.data);
+          if (r.data.status === 0) {
+            //Call Api Save User
+            axios
+              .post(urlSet, {
+                body: nuser
+              })
+              .then(r => {
+                if (r.data.status === 0) {
+                  console.log(r.data.detail);
+                  toastr.options = this.toastrOptions;
+                  toastr["success"]("Add Account", "Success");
+
+                  //Reset les champs du formulaire sur success
+                  e.target.reset();
+                } else {
+                  console.log("Error");
+                  console.log(r.data);
+                }
+              })
+              .catch(e => {
+                console.log("Catch Error");
+                console.log(e);
+              });
+          } else {
+            toastr.options = this.toastrOptions;
+            toastr["error"](r.data.detail, "Error");
+          }
         })
-        .catch(e => {
-          console.log("Catch Error");
-          console.log(e);
+        .catch(err => {
+          console.log(err);
         });
     }
   }
 });
 </script>
+
 

@@ -2,11 +2,11 @@ const admin = require('firebase-admin');
 const {
     v4: uuidv4
 } = require('uuid');
-let serviceAccount = require('./sharerpg-772e6-f9609743f0e5.json');
+let serviceAccount = require('./keys/sharerpg-772e6-96916b968962.json');
 
 
 function ApiSet(req) {
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject) => {
         try {
             try {
                 let db = admin.firestore();
@@ -29,24 +29,30 @@ function ApiSet(req) {
                 "prenom": req.body.prenom,
                 "password": req.body.password
             }
-            console.log("objet");
-            console.log(dat);
+            //console.log("objet");
+            //console.log(dat);
 
+            const er = {
+                status: 0,
+                detail: {}
+            }
             //let setAda = 
             docRef.set(dat)
                 .then(e => {
                     console.log("success");
-                    resolve(dat)
+                    er.detail = dat
+                    resolve(er)
                 })
                 .catch(err => {
-                    console.log("error");
-                    throw err;
+                    er.status = 1;
+                    reject(er)
                     //reject(err)
                 })
 
         } catch (err) {
             console.log(err);
-            reject(err)
+            er.status = 1;
+            reject(er)
         }
     })
 }

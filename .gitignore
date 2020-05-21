@@ -1,8 +1,7 @@
 .DS_Store
 node_modules
 /dist
-sharerpg-772e6-f9609743f0e5.json
-sharerpg-772e6-20e26588db39.json
+/keys
 
 # local env files
 .env.local
