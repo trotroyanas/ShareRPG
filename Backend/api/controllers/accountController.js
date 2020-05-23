@@ -102,8 +102,6 @@ exports.Get = async (req, res) => {
         res.status(500).json(Retour)
         return
       });
-
-
   } catch (err) {
     Retour.status = 1;
     Retour.detail = err
