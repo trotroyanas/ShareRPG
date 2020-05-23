@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const Retour = require('../models/retour.json')
 const {
   v4: uuidv4
 } = require('uuid');
@@ -64,6 +65,53 @@ async function EmailExist(email) {
     return er;
   }
 }
+
+
+
+exports.Get = async (req, res) => {
+  try {
+
+    //console.log(req.params.userId);
+    //Cnx BDD
+    let db = CnxDB();
+
+
+    let docRef = await db.collection('users').doc(req.params.userId);
+    let getDoc = docRef.get()
+      .then(doc => {
+        if (!doc.exists) {
+          Retour.status = 1;
+          Retour.detail = 'No such document!';
+          res.status(500).json(Retour)
+          return
+        } else {
+          //console.log('Document data:', doc.data());
+          Retour.status = 0;
+          Retour.detail = {
+            "nickname": doc.data().nickname,
+            "email": doc.data().email
+          }
+          res.status(200).json(Retour)
+          return
+        }
+      })
+      .catch(err => {
+        Retour.status = 1;
+        Retour.detail = err
+        console.log(Retour);
+        res.status(500).json(Retour)
+        return
+      });
+
+
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err
+    console.log(Retour);
+    res.status(500).json(Retour)
+    return
+  }
+};
 
 
 exports.Add = async (req, res) => {
