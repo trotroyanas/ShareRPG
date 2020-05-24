@@ -3,5 +3,7 @@
    "nickname": "",
    "name": "",
    "lastname": "",
-   "password": ""
+   "password": "",
+   "created": null,
+   "timestamp": null
  }

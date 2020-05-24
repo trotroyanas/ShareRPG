@@ -136,8 +136,14 @@ exports.Add = async (req, res) => {
       nUser[key] = req.body[key];
     });
 
+
     //enc password
     nUser.password = EncPwd(nUser.password);
+    //Horodatage du user
+    const dte = new Date().toISOString();
+    let tstamp = Math.round(new Date().getTime());
+    nUser.created = dte;
+    nUser.timestamp = tstamp;
 
     //Cnx BDD
     let db = CnxDB();
@@ -151,8 +157,6 @@ exports.Add = async (req, res) => {
           ...nUser,
           id: uuid
         }
-        //console.log(er);
-        //console.log("fin");
         res.status(200).send(er)
       })
       .catch(err => {
@@ -223,6 +227,50 @@ exports.Check = async (req, res) => {
       detail: err
     }
     res.status(500).json(er);
+    return
+  }
+};
+
+
+exports.Login = async (req, res) => {
+  try {
+
+    const passEnc = EncPwd(req.body.password);
+
+    const db = CnxDB();
+    let docRef = await db.collection('users');
+
+    await docRef
+      .where('email', '==', req.body.email)
+      .where('password', '==', passEnc)
+      .limitToLast(1)
+      .get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          //console.log("email non trouvé");
+          Retour.status = 1
+          Retour.detail = "Error email/password not found"
+          console.log(Retour);
+          res.status(500).json(Retour);
+          return;
+        } else {
+          snapshot.forEach(doc => {
+            console.log(doc.id, '=>', doc.data());
+          });
+
+
+          Retour.status = 0
+          Retour.detail = "Success you're logged";
+          res.status(200).json(Retour);
+          return;
+        }
+      })
+    //console.log("fin :" + Ret);
+  } catch (err) {
+    Retour.status = 1;
+    Retourdetail = err;
+    console.log(Retour);
+    res.status(500).json(Retour);
     return
   }
 };
