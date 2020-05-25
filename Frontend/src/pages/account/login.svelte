@@ -1,11 +1,44 @@
 <script>
+  import toastr from "toastr";
+  import axios from "axios";
+  import Urls from "../configs/call-urls.js";
+  import toastrOptions from "../configs/toastroptions.js";
+  toastr.options = toastrOptions;
+
+  let NotifySuccessVisible = false;
+  let NotifyErrorVisible = false;
+
   let email = "trotro@gmail.com";
   let password = "colosus";
 
-  function formSubmit(e) {
-    // donne les options à toastr
-    console.log(email);
-    console.log(password);
+  async function formSubmit(e) {
+    //console.log(email);
+    //console.log(password);
+
+    await axios
+      .post(Urls.login, {
+        email: email,
+        password: password
+      })
+      .then(r => {
+        //console.log(r.data);
+        if (r.data.status === 0) {
+          //console.log(r.data.detail);
+          toastr["success"]("You're connected", "Success");
+          NotifySuccessVisible = true;
+          NotifyErrorVisible = false;
+          e.target.reset();
+        } else {
+          toastr["error"](r.data.detail, "Error");
+          NotifySuccessVisible = false;
+          NotifyErrorVisible = true;
+        }
+      })
+      .catch(e => {
+        console.log("Catch Error");
+        console.log(e);
+        toastr["error"](e, "Error");
+      });
   }
 </script>
 
@@ -164,6 +197,18 @@
       </div>
       <button type="submit" class="btn btn-primary">Create</button>
     </form>
+    <div class="form-notify text-center mt30">
+      <span
+        class="notify-success"
+        style={NotifySuccessVisible === true ? 'display:visible' : 'display:none'}>
+        Success : Your account added.
+      </span>
+      <span
+        class="notify-error"
+        style={NotifyErrorVisible === true ? 'display:visible' : 'display:none'}>
+        Error : Email already exist.
+      </span>
+    </div>
     <div class="form-separator">OR</div>
     <div class="form-group">
       <button type="button" class="btn btn-primary facebook">

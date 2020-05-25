@@ -1,27 +1,12 @@
 <script>
   import toastr from "toastr";
   import axios from "axios";
+  import Urls from "../configs/call-urls.js";
+  import toastrOptions from "../configs/toastroptions.js";
+  toastr.options = toastrOptions;
 
   let NotifySuccessVisible = false;
   let NotifyErrorVisible = false;
-
-  const toastrOptions = {
-    closeButton: false,
-    debug: false,
-    newestOnTop: true,
-    progressBar: true,
-    positionClass: "toast-top-right",
-    preventDuplicates: false,
-    showDuration: 300,
-    hideDuration: 1000,
-    timeOut: 5000,
-    extendedTimeOut: 1000,
-    showEasing: "swing",
-    hideEasing: "linear",
-    showMethod: "fadeIn",
-    hideMethod: "fadeOut"
-  };
-  toastr.options = toastrOptions;
 
   let er = { status: 0, detail: "" };
 
@@ -41,11 +26,8 @@
       return;
     }
 
-    const urlVer = "http://localhost:3000/api/account/check";
-    const urlSet = "http://localhost:3000/api/account/add";
-
     axios
-      .post(urlVer, {
+      .post(Urls.check, {
         email: user.email
       })
       .then(r => {
@@ -54,7 +36,7 @@
         if (r.data.status === 0) {
           //Call Api Save User
           axios
-            .post(urlSet, {
+            .post(Urls.add, {
               email: user.email,
               nickname: user.nickname,
               lastname: user.lastname,

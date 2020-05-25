@@ -251,7 +251,7 @@ exports.Login = async (req, res) => {
           Retour.status = 1
           Retour.detail = "Error email/password not found"
           console.log(Retour);
-          res.status(500).json(Retour);
+          res.status(200).json(Retour);
           return;
         } else {
           snapshot.forEach(doc => {
