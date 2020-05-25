@@ -2,6 +2,9 @@
   import toastr from "toastr";
   import axios from "axios";
 
+  let NotifySuccessVisible = false;
+  let NotifyErrorVisible = false;
+
   const toastrOptions = {
     closeButton: false,
     debug: false,
@@ -46,11 +49,9 @@
         email: user.email
       })
       .then(r => {
-        /*         console.log("retour");
-        console.log(r.data);
- */ if (
-          r.data.status === 0
-        ) {
+        //console.log("retour");
+        //console.log(r.data);
+        if (r.data.status === 0) {
           //Call Api Save User
           axios
             .post(urlSet, {
@@ -66,6 +67,8 @@
                 //console.log(r.data.detail);
                 toastr["success"]("Add Account", "Success");
                 //Reset les champs du formulaire sur success
+                NotifySuccessVisible = true;
+                NotifyErrorVisible = false;
                 e.target.reset();
               } else {
                 console.log("Error");
@@ -78,6 +81,8 @@
             });
         } else {
           toastr["error"](r.data.detail, "Error");
+          NotifySuccessVisible = false;
+          NotifyErrorVisible = true;
         }
       })
       .catch(err => {
@@ -145,13 +150,14 @@
     padding: 15px 25px;
     border-radius: 6px;
     cursor: pointer;
+    width: 100%;
   }
 
   .btn.btn-primary:hover {
     background-color: var(--blood-dark);
   }
 
-  .form-account .btn.btn-primary {
+  .form-account .btn-submit {
     grid-column-end: -1;
   }
 
@@ -185,6 +191,13 @@
 
   .facebook {
     background-color: #4267b2 !important;
+  }
+
+  .notify-success {
+    color: var(--green-dark);
+  }
+  .notify-error {
+    color: var(--blood-dark);
   }
 
   @media screen and (max-width: 1012px) {
@@ -273,7 +286,22 @@
             bind:value={user.passwordConfirm}
             required />
         </div>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <div class="form-notify">
+          <span
+            class="notify-success"
+            style={NotifySuccessVisible === true ? 'display:visible' : 'display:none'}>
+            Success : Your account added.
+          </span>
+          <span
+            class="notify-error"
+            style={NotifyErrorVisible === true ? 'display:visible' : 'display:none'}>
+            Error : Email already exist.
+          </span>
+        </div>
+        <div class="btn-submit">
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+
       </form>
     </div>
   </div>
