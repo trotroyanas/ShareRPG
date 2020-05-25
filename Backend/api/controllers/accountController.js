@@ -234,7 +234,6 @@ exports.Check = async (req, res) => {
 
 exports.Login = async (req, res) => {
   try {
-
     const passEnc = EncPwd(req.body.password);
 
     const db = CnxDB();
@@ -243,7 +242,8 @@ exports.Login = async (req, res) => {
     await docRef
       .where('email', '==', req.body.email)
       .where('password', '==', passEnc)
-      .limitToLast(1)
+      //.orderBy('timestamp')
+      .limit(1)
       .get()
       .then(snapshot => {
         if (snapshot.empty) {
@@ -255,20 +255,22 @@ exports.Login = async (req, res) => {
           return;
         } else {
           snapshot.forEach(doc => {
-            console.log(doc.id, '=>', doc.data());
+            Retour.status = 0;
+            Retour.detail = {
+              "userId": doc.id,
+              "nickname": doc.data().nickname,
+              "email": doc.data().email
+            }
+            console.log(Retour);
+            res.status(200).json(Retour);
+            return;
           });
-
-
-          Retour.status = 0
-          Retour.detail = "Success you're logged";
-          res.status(200).json(Retour);
-          return;
         }
       })
     //console.log("fin :" + Ret);
   } catch (err) {
     Retour.status = 1;
-    Retourdetail = err;
+    Retour.detail = err;
     console.log(Retour);
     res.status(500).json(Retour);
     return
