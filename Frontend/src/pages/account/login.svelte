@@ -1,43 +1,57 @@
 <script>
+  import { goto } from "@sveltech/routify";
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "../configs/call-urls.js";
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
+  import kapi from "../configs/cle_api.json";
+
+  import Cooks from "../configs/SessionCookie.js";
+
   let NotifySuccessVisible = false;
   let NotifyErrorVisible = false;
+  let NotifyErrorMessage = "";
 
-  let email = "trotro@gmail.com";
+  let email = "trotroyanas@gmail.com";
   let password = "colosus";
+
+  function ssdcs() {
+    Cooks.delCookie();
+    console.log("Del cookie");
+  }
 
   async function formSubmit(e) {
     //console.log(email);
     //console.log(password);
-
     await axios
       .post(Urls.login, {
         email: email,
-        password: password
+        password: password,
+        cle_api: kapi.cle_api
       })
       .then(r => {
         //console.log(r.data);
         if (r.data.status === 0) {
-          //console.log(r.data.detail);
           toastr["success"]("You're connected", "Success");
           NotifySuccessVisible = true;
           NotifyErrorVisible = false;
           e.target.reset();
+          Cooks.saveCookie(r.data.detail);
         } else {
           toastr["error"](r.data.detail, "Error");
+          NotifyErrorMessage = r.data.detail;
           NotifySuccessVisible = false;
           NotifyErrorVisible = true;
+          sessionStorage.clear();
         }
       })
       .catch(e => {
         console.log("Catch Error");
         console.log(e);
         toastr["error"](e, "Error");
+        $goto("/");
       });
   }
 </script>
@@ -195,9 +209,11 @@
           bind:value={password}
           required />
       </div>
-      <button type="submit" class="btn btn-primary">Create</button>
+      <button type="submit" class="btn btn-primary">Login</button>
+
     </form>
     <div class="form-notify text-center mt30">
+      <input type="button" on:click={ssdcs} value="qdscqcqs" />
       <span
         class="notify-success"
         style={NotifySuccessVisible === true ? 'display:visible' : 'display:none'}>
@@ -206,7 +222,7 @@
       <span
         class="notify-error"
         style={NotifyErrorVisible === true ? 'display:visible' : 'display:none'}>
-        Error : Email already exist.
+        {NotifyErrorMessage}
       </span>
     </div>
     <div class="form-separator">OR</div>
@@ -217,6 +233,7 @@
       </button>
     </div>
     <div class="form-group mt30">
+
       <button type="button" class="btn btn-primary google">
         <i class="fab fa-google" />
         &nbsp;google

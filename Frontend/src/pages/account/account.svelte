@@ -2,11 +2,13 @@
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "../configs/call-urls.js";
+  import kapi from "../configs/cle_api.json";
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
   let NotifySuccessVisible = false;
   let NotifyErrorVisible = false;
+  let NotifyErrorMessage = "";
 
   let er = { status: 0, detail: "" };
 
@@ -19,56 +21,49 @@
     passwordConfirm: "colosus"
   };
 
-  function formSubmit(e) {
+  async function formSubmit(e) {
     // donne les options à toastr
     if (user.password !== user.passwordConfirm) {
       toastr["error"]("Passwords not match", "Error");
+      NotifyErrorMessage = "Passwords not match";
+      NotifySuccessVisible = false;
+      NotifyErrorVisible = true;
       return;
     }
 
-    axios
-      .post(Urls.check, {
-        email: user.email
+    await axios
+      .post(Urls.add, {
+        email: user.email,
+        nickname: user.nickname,
+        lastname: user.lastname,
+        name: user.name,
+        password: user.password,
+        cle_api: kapi.cle_api
       })
       .then(r => {
-        //console.log("retour");
         //console.log(r.data);
         if (r.data.status === 0) {
-          //Call Api Save User
-          axios
-            .post(Urls.add, {
-              email: user.email,
-              nickname: user.nickname,
-              lastname: user.lastname,
-              name: user.name,
-              password: user.password
-            })
-            .then(r => {
-              //console.log(r.data);
-              if (r.data.status === 0) {
-                //console.log(r.data.detail);
-                toastr["success"]("Add Account", "Success");
-                //Reset les champs du formulaire sur success
-                NotifySuccessVisible = true;
-                NotifyErrorVisible = false;
-                e.target.reset();
-              } else {
-                console.log("Error");
-                console.log(r.data);
-              }
-            })
-            .catch(e => {
-              console.log("Catch Error");
-              console.log(e);
-            });
+          toastr["success"]("Add Account", "Success");
+          NotifySuccessVisible = true;
+          NotifyErrorVisible = false;
+          //Reset les champs du formulaire sur success
+          e.target.reset();
+          return;
         } else {
-          toastr["error"](r.data.detail, "Error");
+          NotifyErrorMessage = r.data.detail;
           NotifySuccessVisible = false;
           NotifyErrorVisible = true;
+          toastr["error"](NotifyErrorMessage, "Error");
+          return;
         }
       })
-      .catch(err => {
-        console.log(err);
+      .catch(e => {
+        NotifyErrorMessage = e;
+        NotifySuccessVisible = false;
+        NotifyErrorVisible = true;
+        toastr["error"]("Error unknow", "Error");
+        console.log(e);
+        return;
       });
   }
 </script>
@@ -277,7 +272,7 @@
           <span
             class="notify-error"
             style={NotifyErrorVisible === true ? 'display:visible' : 'display:none'}>
-            Error : Email already exist.
+            Error : {NotifyErrorMessage}
           </span>
         </div>
         <div class="btn-submit">

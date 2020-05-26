@@ -24,9 +24,13 @@ app.get("/", (req, res) => {
   res.json("Hola Svelte Developers...Shall we fight??");
 });
 
-
 const account = require("./api/routes/account.js");
 app.use("/api/account", account);
+
+
+const mycache = require("./api/controllers/cache.js");
+mycache.FillCache();
+
 
 app.listen(PORT, () => {
   console.log(`App is running on ${PORT}`);

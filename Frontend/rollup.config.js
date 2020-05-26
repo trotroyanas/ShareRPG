@@ -2,11 +2,12 @@ import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
+import {
+  terser
+} from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy'
 import del from 'del'
-
-
+import json from '@rollup/plugin-json';
 
 const staticDir = 'static'
 const distDir = 'dist'
@@ -18,7 +19,11 @@ const shouldPrerender = (typeof process.env.PRERENDER !== 'undefined') ? process
 
 del.sync(distDir + '/**')
 
-function createConfig({ output, inlineDynamicImports, plugins = [] }) {
+function createConfig({
+  output,
+  inlineDynamicImports,
+  plugins = []
+}) {
   const transform = inlineDynamicImports ? bundledTransform : dynamicTransform
 
   return {
@@ -30,13 +35,21 @@ function createConfig({ output, inlineDynamicImports, plugins = [] }) {
       ...output
     },
     plugins: [
+      json(),
       copy({
-        targets: [
-          { src: staticDir + '/**/!(__index.html)', dest: distDir },
-          { src: `${staticDir}/__index.html`, dest: distDir, rename: '__app.html', transform },
+        targets: [{
+            src: staticDir + '/**/!(__index.html)',
+            dest: distDir
+          },
+          {
+            src: `${staticDir}/__index.html`,
+            dest: distDir,
+            rename: '__app.html',
+            transform
+          },
         ],
-	copyOnce: true,
-	flatten: false
+        copyOnce: true,
+        flatten: false
       }),
       svelte({
         // enable run-time checks when not in production
@@ -101,7 +114,7 @@ const dynamicConfig = {
 const configs = [createConfig(bundledConfig)]
 if (bundling === 'dynamic')
   configs.push(createConfig(dynamicConfig))
-if (shouldPrerender) [...configs].pop().plugins.push(prerender())
+if (shouldPrerender)[...configs].pop().plugins.push(prerender())
 export default configs
 
 
