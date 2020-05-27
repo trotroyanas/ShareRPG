@@ -20,6 +20,7 @@
   function ssdcs() {
     Cooks.delCookie();
     console.log("Del cookie");
+    sto.set(888);
   }
 
   async function formSubmit(e) {
@@ -39,6 +40,8 @@
           NotifyErrorVisible = false;
           e.target.reset();
           Cooks.saveCookie(r.data.detail);
+          //window.location.replace("/account/account");
+          location.reload();
         } else {
           toastr["error"](r.data.detail, "Error");
           NotifyErrorMessage = r.data.detail;
@@ -198,7 +201,7 @@
 
 <div class="form-account-marge">
   <div class="form-account login-size">
-    <div class="form-account-title">Login</div>
+    <div class="form-account-title">Login {vv}</div>
     <form
       on:submit|preventDefault={formSubmit}
       class="form-grid"
