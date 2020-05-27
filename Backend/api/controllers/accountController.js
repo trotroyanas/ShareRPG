@@ -98,6 +98,14 @@ exports.Get = async (req, res) => {
 exports.Add = async (req, res) => {
   try {
 
+    //Verify cle_api
+    let kc = cache.ReadCache(req.body.cle_api);
+    if (kc.status == 1) {
+      console.log(kc);
+      res.status(200).json(kc)
+      return;
+    }
+
     let emExist = await EmailExist(req.body.email)
     if (emExist.status === 1) {
       console.log("02");
@@ -153,6 +161,16 @@ exports.Add = async (req, res) => {
 
 exports.Del = async (req, res) => {
   try {
+
+    //Verify cle_api
+    let kc = cache.ReadCache(req.body.cle_api);
+    if (kc.status == 1) {
+      console.log(kc);
+      res.status(200).json(kc)
+      return;
+    }
+
+
     let db = cnx.CnxDB()
     let deleteDoc = await db.collection('users').doc(req.params.userId).delete();
     let er = {
@@ -172,6 +190,16 @@ exports.Del = async (req, res) => {
 
 exports.Put = async (req, res) => {
   try {
+
+    //Verify cle_api
+    let kc = cache.ReadCache(req.body.cle_api);
+    if (kc.status == 1) {
+      console.log(kc);
+      res.status(200).json(kc)
+      return;
+    }
+
+
     console.log("iuserId:" + req.params.userId);
     console.log(req.body);
     let db = cnx.CnxDB()
