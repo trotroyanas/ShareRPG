@@ -1,5 +1,5 @@
 const defUnk = {
-    userId: 0,
+    userId: "0",
     nickname: "unknow",
     email: "unknow@unknow.com"
 }
@@ -37,15 +37,16 @@ const Cooks = {
             let ca = decodedCookie.split(';');
             let co = ca[0].substr(6, (ca[0].length) - 7);
             sessionStorage.setItem('user', JSON.stringify(co));
-            console.log("yop");
-            console.log(co);
+            //console.log("yop");
+            //console.log(co);
+            return co;
         } catch {
             document.cookie = defCook();
             sessionStorage.setItem('user', JSON.stringify(defUnk));
-            console.log("yup");
-            console.log(JSON.stringify(defUnk));
+            //console.log("yup");
+            //console.log(JSON.stringify(defUnk));
+            return defUnk;
         }
-        //return co;
     }
 }
 
