@@ -49,15 +49,20 @@ async function EmailExist(email) {
   }
 }
 
-
 exports.Get = async (req, res) => {
   try {
 
+    //Verify cle_api
+    let kc = cache.ReadCache(req.params.cle_api);
+    if (kc.status == 1) {
+      console.log(kc);
+      res.status(200).json(kc)
+      return;
+    }
 
     //console.log(req.params.userId);
     //Cnx BDD
-    let db = cnx.CnxDB()
-
+    let db = cnx.CnxDB();
 
     let docRef = await db.collection('users').doc(req.params.userId);
     let getDoc = docRef.get()
@@ -163,13 +168,12 @@ exports.Del = async (req, res) => {
   try {
 
     //Verify cle_api
-    let kc = cache.ReadCache(req.body.cle_api);
+    let kc = cache.ReadCache(req.params.cle_api);
     if (kc.status == 1) {
       console.log(kc);
       res.status(200).json(kc)
       return;
     }
-
 
     let db = cnx.CnxDB()
     let deleteDoc = await db.collection('users').doc(req.params.userId).delete();
@@ -192,13 +196,12 @@ exports.Put = async (req, res) => {
   try {
 
     //Verify cle_api
-    let kc = cache.ReadCache(req.body.cle_api);
+    let kc = cache.ReadCache(req.params.cle_api);
     if (kc.status == 1) {
       console.log(kc);
       res.status(200).json(kc)
       return;
     }
-
 
     console.log("iuserId:" + req.params.userId);
     console.log(req.body);
