@@ -131,12 +131,21 @@
   }
 
   .form-separator {
-    margin-top: 25px;
-    border-bottom: solid 1px gray;
-    border-top: solid 1px gray;
-    margin-bottom: 25px;
     padding: 25px 0px 25px;
     text-align: center;
+  }
+
+  .mg-top25 {
+    margin-top: 25px;
+  }
+  .mg-bot25 {
+    margin-bottom: 25px;
+  }
+  .sep-top {
+    border-top: solid 1px gray;
+  }
+  .sep-bot {
+    border-bottom: solid 1px gray;
   }
 
   .mt30 {
@@ -148,6 +157,13 @@
     height: 20px;
     margin: 10px 0px 10px;
     border-radius: 6px;
+  }
+
+  .pdt25 {
+    padding-top: 25px;
+  }
+  .pdb25 {
+    padding-bottom: 25px;
   }
 
   .google {
@@ -225,7 +241,10 @@
         {NotifyErrorMessage}
       </span>
     </div>
-    <div class="form-separator">OR</div>
+    <div class="form-separator sep-top sep-bot mg-top25 mg-bot25">OR</div>
+    <div class="pt mg-bot25 sep-bot pdb25 text-center">
+      <a href="/account/account">Create account</a>
+    </div>
     <div class="form-group">
       <button type="button" class="btn btn-primary facebook">
         <i class="fab fa-facebook facebook" />
