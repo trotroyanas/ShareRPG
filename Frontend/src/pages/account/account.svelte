@@ -1,4 +1,5 @@
 <script>
+  import Navbar from "../components/navbar.svelte";
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "../configs/call-urls.js";
@@ -193,6 +194,7 @@
 </style>
 
 <div>
+<Navbar/>
   <div class="form-account-marge">
     <div class="form-account">
       <div class="form-account-title">Add Account</div>

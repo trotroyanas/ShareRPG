@@ -7,7 +7,10 @@ import {
 } from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy'
 import del from 'del'
+
 import json from '@rollup/plugin-json';
+import babel from 'rollup-plugin-babel';
+
 
 const staticDir = 'static'
 const distDir = 'dist'
@@ -74,6 +77,32 @@ function createConfig({
       commonjs(),
 
 
+      babel({
+        extensions: ['.js', '.mjs', '.html', '.svelte'],
+        runtimeHelpers: true,
+        exclude: ['node_modules/@babel/**', 'node_modules/core-js/**'],
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              targets: {
+                ie: '11'
+              },
+              useBuiltIns: 'usage',
+              corejs: 3
+            }
+          ]
+        ],
+        plugins: [
+          '@babel/plugin-syntax-dynamic-import',
+          [
+            '@babel/plugin-transform-runtime',
+            {
+              useESModules: true
+            }
+          ]
+        ]
+      }),
       // If we're building for production (npm run build
       // instead of npm run dev), minify
       production && terser(),
