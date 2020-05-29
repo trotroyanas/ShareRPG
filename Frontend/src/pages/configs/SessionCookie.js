@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const defUnk = {
     userId: "0",
     nickname: "unknow",
@@ -10,45 +12,68 @@ function defCook(ck) {
     let cs = null;
     if (ck) {
         cs = `user='${JSON.stringify(ck)}';path=/;expires='${dte}';SameSite=Strict`;
+        document.cookie = cs;
+        let bob = cs.toString();
+        localStorage.setItem('user',bob);
+        //console.log(cs);
+        return bob;
     } else {
+        console.log("pas de cookie");
         cs = `user='${JSON.stringify(defUnk)}';path=/;expires='${dte}';SameSite=Strict`;
+        document.cookie = cs;
+        let bob = defUnk.toString();
+        localStorage.setItem('user',bob);
+        //console.log(bob);
+        return bob;
     }
     //console.log(cs);
     return cs;
 }
 
 const Cooks = {
-
+    isConnect()
+    {
+        try {
+            let conn = localStorage.getItem('user');
+            if (!_.isEmpty(conn)){
+                return true;
+            }else {
+                return false
+            }
+        } catch {
+            return false;
+        }
+    },
     saveCookie(v) {
-        document.cookie = defCook(v);
-        sessionStorage.setItem('user', JSON.stringify(v));
-    },
-
-
+        defCook(v);
+        return;
+        },
     delCookie() {
-        document.cookie = defCook();
-        sessionStorage.setItem('user', JSON.stringify(defUnk));
+        //defCook();
+        document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        localStorage.removeItem('user');
+        localStorage.clear();
+        return;
     },
-
-
     readCookie() {
         try {
+            //console.log("read cookie");
             let decodedCookie = decodeURIComponent(document.cookie);
             let ca = decodedCookie.split(';');
             let co = ca[0].substr(6, (ca[0].length) - 7);
-            sessionStorage.setItem('user', JSON.stringify(co));
-            //console.log("yop");
-            //console.log(co);
-            return co;
-        } catch {
-            document.cookie = defCook();
-            sessionStorage.setItem('user', JSON.stringify(defUnk));
-            //console.log("yup");
-            //console.log(JSON.stringify(defUnk));
-            return defUnk;
+            let bob = co.toString();
+            localStorage.setItem('user',bob);
+            //console.log(bob);
+            return bob;
+        } catch (err) {
+            //console.log("pass catch readcookie");
+            //document.cookie = defCook();
+            //return defUnk;
+            //defCook();
+            console.log("Error Read Cookie");
+            return null;
         }
     }
 }
-
 
 export default Cooks;

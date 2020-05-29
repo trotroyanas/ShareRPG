@@ -1,3 +1,10 @@
+<script>
+      import Navbar from "./components/navbar.svelte";
+</script>
+
+<div>
+  <Navbar/>
+</div>
 <header class="masthead bg-primary text-white text-center">
   <div class="container d-flex align-items-center flex-column">
     <!-- Masthead Avatar Image-->

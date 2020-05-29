@@ -1,4 +1,5 @@
 <script>
+  import Navbar from "../components/navbar.svelte";
   import { goto } from "@sveltech/routify";
   import toastr from "toastr";
   import axios from "axios";
@@ -10,18 +11,15 @@
 
   import Cooks from "../configs/SessionCookie.js";
 
-  let NotifySuccessVisible = false;
-  let NotifyErrorVisible = false;
-  let NotifyErrorMessage = "";
+  let NotifyVisible = false;
+  let NotifyMessage = "";
+  let NotifyClass = ""
+
+  let isConnect
+  $:  isConnect = Cooks.isConnect();
 
   let email = "trotroyanas@gmail.com";
   let password = "colosus";
-
-  function ssdcs() {
-    Cooks.delCookie();
-    console.log("Del cookie");
-    sto.set(888);
-  }
 
   async function formSubmit(e) {
     //console.log(email);
@@ -35,26 +33,32 @@
       .then(r => {
         //console.log(r.data);
         if (r.data.status === 0) {
-          toastr["success"]("You're connected", "Success");
-          NotifySuccessVisible = true;
-          NotifyErrorVisible = false;
+          let msg = "You're connected";
+          toastr["success"](msg, "Success");
+          NotifyVisible = true;
+          NotifyMessage = "Succes : " + msg;
+          NotifyClass = "notify-success"
           e.target.reset();
           Cooks.saveCookie(r.data.detail);
+          //console.log(r.data.detail);
+          isConnect = true;
+
           //window.location.replace("/account/account");
-          location.reload();
+          //location.reload();
         } else {
           toastr["error"](r.data.detail, "Error");
-          NotifyErrorMessage = r.data.detail;
-          NotifySuccessVisible = false;
-          NotifyErrorVisible = true;
-          sessionStorage.clear();
+          NotifyMessage = r.data.detail;
+          NotifyVisible = true;
+          NotifyClass = "notify-error"
+          Cooks.delCookie();
+          isConnect = false;
         }
       })
       .catch(e => {
         console.log("Catch Error");
         console.log(e);
         toastr["error"](e, "Error");
-        $goto("/");
+        //$goto("/");
       });
   }
 </script>
@@ -199,9 +203,11 @@
   }
 </style>
 
+<div>
+<Navbar Connect={isConnect} />
 <div class="form-account-marge">
   <div class="form-account login-size">
-    <div class="form-account-title">Login {vv}</div>
+    <div class="form-account-title">Login</div>
     <form
       on:submit|preventDefault={formSubmit}
       class="form-grid"
@@ -229,19 +235,12 @@
           required />
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
-
     </form>
     <div class="form-notify text-center mt30">
-      <input type="button" on:click={ssdcs} value="qdscqcqs" />
       <span
-        class="notify-success"
-        style={NotifySuccessVisible === true ? 'display:visible' : 'display:none'}>
-        Success : Your account added.
-      </span>
-      <span
-        class="notify-error"
-        style={NotifyErrorVisible === true ? 'display:visible' : 'display:none'}>
-        {NotifyErrorMessage}
+        class="{NotifyClass}"
+        style={NotifyVisible === true ? 'display:visible' : 'display:none'}>
+        {NotifyMessage}
       </span>
     </div>
     <div class="form-separator sep-top sep-bot mg-top25 mg-bot25">OR</div>
@@ -262,4 +261,5 @@
       </button>
     </div>
   </div>
+</div>
 </div>

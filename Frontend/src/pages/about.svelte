@@ -1,4 +1,5 @@
 <script>
+  import Navbar from "./components/navbar.svelte";
   import { goto } from "@sveltech/routify";
 
   import cook from "./configs/SessionCookie.js";
@@ -13,6 +14,10 @@
     //$goto("/");
   }
 </script>
+
+<div>
+  <Navbar/>
+</div>
 
 <button on:click={login}>LogIn</button>
 <br />

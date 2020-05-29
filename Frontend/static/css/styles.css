@@ -78,6 +78,7 @@ body {
     color: #212529;
     text-align: left;
     background-color: #fff;
+    overflow-y:scroll;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {
@@ -585,15 +586,24 @@ pre code {
 
 .container {
     width: 100%;
-    padding-right: 1.5rem;
-    padding-left: 1.5rem;
     margin-right: auto;
     margin-left: auto;
+/*     
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+ */ 
 }
 
 .MargeApp {
     margin-top: 74px;
 }
+
+.BodyRoutify {
+    margin-top: 74px;
+        min-height: calc(100vh - (74px + 362px + 72px));
+
+}
+
 
 
 @media (min-width: 576px) {
@@ -613,9 +623,11 @@ pre code {
         max-width: 960px;
     }
 
-    .MargeApp {
-        margin-top: 104px;
-    }
+.BodyRoutify {
+    margin-top: 104px;
+    min-height: calc(100vh - (104px + 362px + 72px));
+
+}    
 
 }
 
@@ -631,10 +643,12 @@ pre code {
 .container-sm,
 .container-xl {
     width: 100%;
-    padding-right: 1.5rem;
-    padding-left: 1.5rem;
     margin-right: auto;
     margin-left: auto;
+/*     
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+ */ 
 }
 
 @media (min-width: 576px) {
@@ -8287,7 +8301,8 @@ button.bg-dark:hover {
 }
 
 .h-auto {
-    height: auto !important;
+
+    eight: auto !important;
 }
 
 .mw-100 {
@@ -10993,7 +11008,7 @@ a.text-dark:hover {
 }
 
 .masthead {
-    padding-top: calc(6rem + 74px);
+    padding-top: calc(6rem);
     padding-bottom: 6rem;
 }
 
@@ -11012,7 +11027,7 @@ a.text-dark:hover {
 
 @media (min-width: 992px) {
     .masthead {
-        padding-top: calc(6rem + 104px);
+        padding-top: calc(6rem);
         padding-bottom: 6rem;
     }
 
