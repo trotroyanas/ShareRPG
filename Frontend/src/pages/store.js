@@ -1,9 +1,5 @@
-import {
-    writable
-} from 'svelte/store';
-
+import { writable } from "svelte/store";
 export const sto = writable(22);
-
 
 /* Pour appeller dans une autre page */
 /*

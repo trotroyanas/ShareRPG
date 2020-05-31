@@ -16,7 +16,7 @@
 </script>
 
 <div>
-  <Navbar/>
+  <Navbar />
 </div>
 
 <button on:click={login}>LogIn</button>
