@@ -12,5 +12,7 @@
 <div>
   <Navbar/>
 </div>
-<!-- Core theme JS-->
-<div class="tst">Vous êtes sur la page Contact</div>
+
+
+        <!-- Core theme JS-->
+        <div class="tst">Vous êtes sur la page Contact</div>
