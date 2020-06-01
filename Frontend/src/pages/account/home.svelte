@@ -2,12 +2,16 @@
   import Navbar from "../components/navbar.svelte";
   import Cooks from "../configs/SessionCookie.js";
   import { goto } from "@sveltech/routify";
+  import toastr from "toastr";
+  import toastrOptions from "../configs/toastroptions.js";
+  toastr.options = toastrOptions;
 
   let isConnect;
   $: isConnect = Cooks.isConnect();
 
   function logout() {
     Cooks.delCookie();
+    toastr["success"]("You're logout", "Success");
     $goto("/login");
   }
 </script>
@@ -98,7 +102,7 @@
   <div class="ugrid bdb">
 
     <div class="cardo">
-      <a href="/account/create">
+      <a href="/account/create" title="Add documents">
         <div class="ricon2">
           <i class="fas fa-store fa-8x ColText" />
         </div>
@@ -106,7 +110,7 @@
     </div>
 
     <div class="cardo">
-      <a href="/account/history">
+      <a href="/account/history" title="Sales history">
         <div class="ricon">
           <svg
             version="1.1"
@@ -171,7 +175,15 @@
     </div>
 
     <div class="cardo">
-      <a href="/account/chgpassword">
+      <a href="/account/messages" title="Messages" data-tooltip="Messages">
+        <div class="ricon2">
+          <i class="far fa-envelope fa-8x ColText" />
+        </div>
+      </a>
+    </div>
+
+    <div class="cardo">
+      <a href="/account/chgpassword" title="Change password">
         <div class="ricon">
 
           <svg
@@ -199,7 +211,7 @@
     </div>
 
     <div class="cardo">
-      <a href="/account/profil">
+      <a href="/account/profil" title="Edit profil">
         <div class="ricon2">
           <i class="fas fa-user fa-8x ColText" />
         </div>
@@ -207,7 +219,7 @@
     </div>
 
     <div class="cardo">
-      <a href="/account/home" on:click|preventDefault={logout}>
+      <a href="/" on:click|preventDefault={logout} title="Logout">
         <div class="ricon2">
           <i class="fas fa-sign-out-alt fa-8x ColText" />
         </div>
