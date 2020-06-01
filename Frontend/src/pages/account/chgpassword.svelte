@@ -17,17 +17,39 @@
   let isConnect;
   $: isConnect = Cooks.isConnect();
 
-  let email = "trotroyanas@gmail.com";
   let password = "colosus";
+  let cupwd = "colosus";
+  let copwd = "colosus";
 
   async function formSubmit(e) {
-    //console.log(email);
     //console.log(password);
-    await axios
-      .post(Urls.login, {
-        email: email,
-        password: password,
-        cle_api: kapi.cle_api
+    if (password !== copwd) {
+      toastr["error"]("Passwords not match.", "Error");
+      e.target.reset();
+      return;
+    }
+
+    let sess = Cooks.readConnected();
+    console.log(sess);
+
+    let axiosData = {
+      current_password: cupwd,
+      password: password
+    };
+
+    let axiosConfig = {
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        "auth-token": sess
+      }
+    };
+
+    axios
+      .post(Urls.chgpwd, axiosData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + sess
+        }
       })
       .then(r => {
         //console.log(r.data);
@@ -38,10 +60,9 @@
           NotifyMessage = "Succes : " + msg;
           NotifyClass = "notify-success";
           e.target.reset();
-          Cooks.saveCookie(r.data.detail);
           //console.log(r.data.detail);
-          isConnect = true;
-          $goto("/account/home");
+          //isConnect = true;
+          //$goto("/account/home");
 
           //window.location.replace("/account/account");
           //location.reload();
@@ -77,7 +98,17 @@
         class="form-grid"
         id="Form-Login"
         method="post"
-        action="/api/account/login">
+        action="/api/account/chgpwd">
+        <div class="form-group">
+          <label for="password">Current Password</label>
+          <input
+            type="password"
+            id="cupwd"
+            name="password"
+            class="form-control"
+            bind:value={cupwd}
+            required />
+        </div>
         <div class="form-group">
           <label for="password">Password</label>
           <input
@@ -89,13 +120,13 @@
             required />
         </div>
         <div class="form-group">
-          <label for="passwordConf">Password</label>
+          <label for="passwordConf">Confirm Password</label>
           <input
             type="password"
-            id="passwordConf"
+            id="copwd"
             name="passwordConf"
             class="form-control"
-            bind:value={password}
+            bind:value={copwd}
             required />
         </div>
         <button type="submit" class="btn btn-primary">Change</button>

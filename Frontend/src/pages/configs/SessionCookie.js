@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 const defUnk = {
-  userId: "0",
+  userid: "0",
   nickname: "unknow",
   email: "unknow@unknow.com",
 };
@@ -9,24 +9,18 @@ const defUnk = {
 function defCook(ck) {
   let date = new Date(Date.now() + 86400000 * 7); //86400000ms = 1 jour
   let dte = date.toUTCString();
-  let cs = null;
+  let cs = "";
   if (ck) {
-    cs = `user='${JSON.stringify(ck)}';path=/;expires='${dte}';SameSite=Strict`;
+    let ckk = ck.toString();
+    let cs = "";
+    cs = `token='${ckk}';path=/;expires='${dte}';SameSite=Strict`;
     document.cookie = cs;
-    let bob = cs.toString();
-    localStorage.setItem("user", bob);
-    //console.log(cs);
-    return bob;
+    localStorage.setItem("token", ckk);
+    return ck;
   } else {
     console.log("pas de cookie");
-    cs = `user='${JSON.stringify(
-      defUnk
-    )}';path=/;expires='${dte}';SameSite=Strict`;
-    document.cookie = cs;
-    let bob = defUnk.toString();
-    localStorage.setItem("user", bob);
-    //console.log(bob);
-    return bob;
+    delCookie();
+    return;
   }
   //console.log(cs);
   return cs;
@@ -35,7 +29,7 @@ function defCook(ck) {
 const Cooks = {
   isConnect() {
     try {
-      let conn = localStorage.getItem("user");
+      let conn = localStorage.getItem("token");
       if (!_.isEmpty(conn)) {
         return true;
       } else {
@@ -50,9 +44,8 @@ const Cooks = {
     return;
   },
   delCookie() {
-    //defCook();
-    document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    localStorage.removeItem("user");
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("token");
     localStorage.clear();
     return;
   },
@@ -61,18 +54,20 @@ const Cooks = {
       //console.log("read cookie");
       let decodedCookie = decodeURIComponent(document.cookie);
       let ca = decodedCookie.split(";");
-      let co = ca[0].substr(6, ca[0].length - 7);
-      let bob = co.toString();
-      localStorage.setItem("user", bob);
-      //console.log(bob);
-      return bob;
+      let co = ca[0].substring(7, ca[0].length - 1);
+      localStorage.setItem("token", co);
+      return co;
     } catch (err) {
-      //console.log("pass catch readcookie");
-      //document.cookie = defCook();
-      //return defUnk;
-      //defCook();
       console.log("Error Read Cookie");
-      return null;
+      return;
+    }
+  },
+  readConnected() {
+    try {
+      let u = localStorage.getItem("token");
+      return u;
+    } catch (err) {
+      console.log(err);
     }
   },
 };

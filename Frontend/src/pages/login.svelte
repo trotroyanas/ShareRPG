@@ -8,15 +8,14 @@
   toastr.options = toastrOptions;
 
   import kapi from "./configs/cle_api.json";
-
   import Cooks from "./configs/SessionCookie.js";
 
   let NotifyVisible = false;
   let NotifyMessage = "";
   let NotifyClass = "";
 
-  let isConnect;
-  $: isConnect = Cooks.isConnect();
+  let isConnect = false;
+  //Cooks.isConnect();
 
   let email = "trotroyanas@gmail.com";
   let password = "colosus";
@@ -24,11 +23,11 @@
   async function formSubmit(e) {
     //console.log(email);
     //console.log(password);
+
     await axios
       .post(Urls.login, {
         email: email,
-        password: password,
-        cle_api: kapi.cle_api
+        password: password
       })
       .then(r => {
         //console.log(r.data);
