@@ -24,13 +24,10 @@ app.get("/", (req, res) => {
   res.json("Hola Svelte Developers...Shall we fight??");
 });
 
-const account = require("./src/routes/account.js");
-app.use("/account", account);
+const account = require("../src/routes/account.js");
+app.use("/api/account", account);
 
-/* const account = path.basename("../src/routes/account.js");
-app.use("/account", account); */
-
-const mycache = require("./src/controllers/cache.js");
+const mycache = require("../src/controllers/cache.js");
 mycache.FillCache();
 
 app.listen(PORT, () => {
