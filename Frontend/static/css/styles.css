@@ -600,8 +600,7 @@ pre code {
 
 .BodyRoutify {
     margin-top: 74px;
-        min-height: calc(100vh - (74px + 362px + 72px));
-
+    min-height: calc(100vh - (74px + 362px + 72px));
 }
 
 
@@ -623,11 +622,11 @@ pre code {
         max-width: 960px;
     }
 
-.BodyRoutify {
-    margin-top: 104px;
-    min-height: calc(100vh - (104px + 362px + 72px));
+    .BodyRoutify {
+        margin-top: 104px;
+        min-height: calc(100vh - (104px + 362px + 72px));
 
-}    
+    }    
 
 }
 
@@ -2202,6 +2201,11 @@ pre code {
 }
 
 .form-control::-ms-input-placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+.form-control:-ms-input-placeholder {
     color: #6c757d;
     opacity: 1;
 }

@@ -8,22 +8,31 @@
 </script>
 
 <style>
+  .BodyRoutify {
+    border: solid 1px blue;
+    margin-top: 104px;
+    min-height: calc(100vh - (104px + 272px + 48px + 72px));
+  }
+
   .form-account-marge {
     min-height: calc(100vh -60px);
     padding-top: 50px;
   }
 
-  @media screen and (max-width: 1012px) {
+  @media screen and (max-width: 992px) {
     .form-account-marge {
-      margin-top: 15px;
       min-height: calc(100vh -60px);
     }
-  }
 
-  @media screen and (max-width: 800px) {
+    .BodyRoutify {
+      border: solid 1px orange;
+      margin-top: 74px;
+      min-height: calc(100vh - (74px + 368px + 72px));
+    }
+
     .form-account-marge {
-      margin-top: 15px;
       min-height: calc(100vh -60px);
+      padding-top: 50px;
     }
   }
 
@@ -37,7 +46,7 @@
   }
 </style>
 
-<div>
+<div class="BodyRoutify">
   <Navbar Connect={isConnect} />
   <div class="form-account-marge">
     <div class="e404">
