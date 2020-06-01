@@ -8,7 +8,6 @@
   toastr.options = toastrOptions;
 
   import kapi from "../configs/cle_api.json";
-
   import Cooks from "../configs/SessionCookie.js";
 
   let NotifyVisible = false;
@@ -42,6 +41,7 @@
           Cooks.saveCookie(r.data.detail);
           //console.log(r.data.detail);
           isConnect = true;
+          $goto("/account/home");
 
           //window.location.replace("/account/account");
           //location.reload();
@@ -71,23 +71,13 @@
   <Navbar Connect={isConnect} />
   <div class="form-account-marge">
     <div class="form-account login-size">
-      <div class="form-account-title">Login</div>
+      <div class="form-account-title">Change Password</div>
       <form
         on:submit|preventDefault={formSubmit}
         class="form-grid"
         id="Form-Login"
         method="post"
         action="/api/account/login">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            class="form-control"
-            bind:value={email}
-            required />
-        </div>
         <div class="form-group">
           <label for="password">Password</label>
           <input
@@ -98,7 +88,17 @@
             bind:value={password}
             required />
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <div class="form-group">
+          <label for="passwordConf">Password</label>
+          <input
+            type="password"
+            id="passwordConf"
+            name="passwordConf"
+            class="form-control"
+            bind:value={password}
+            required />
+        </div>
+        <button type="submit" class="btn btn-primary">Change</button>
       </form>
       <div class="form-notify text-center mt30">
         <span
@@ -106,23 +106,6 @@
           style={NotifyVisible === true ? 'display:visible' : 'display:none'}>
           {NotifyMessage}
         </span>
-      </div>
-      <div class="form-separator sep-top sep-bot mg-top25 mg-bot25">OR</div>
-      <div class="pt mg-bot25 sep-bot pdb25 text-center">
-        <a href="/account/account">Create account</a>
-      </div>
-      <div class="form-group">
-        <button type="button" class="btn btn-primary facebook">
-          <i class="fab fa-facebook facebook" />
-          &nbsp;facebook
-        </button>
-      </div>
-      <div class="form-group mt30">
-
-        <button type="button" class="btn btn-primary google">
-          <i class="fab fa-google" />
-          &nbsp;google
-        </button>
       </div>
     </div>
   </div>

@@ -1,10 +1,10 @@
 <script>
-  import Navbar from "../components/navbar.svelte";
+  import Navbar from "./components/navbar.svelte";
   import toastr from "toastr";
   import axios from "axios";
-  import Urls from "../configs/call-urls.js";
-  import kapi from "../configs/cle_api.json";
-  import toastrOptions from "../configs/toastroptions.js";
+  import Urls from "./configs/call-urls.js";
+  import kapi from "./configs/cle_api.json";
+  import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
 
   let NotifySuccessVisible = false;

@@ -25,7 +25,7 @@ app.get("/", (req: any, res: any) => {
 });
 
 const account = require("./src/routes/account.js");
-app.use("/account", account);
+app.use("/api/account", account);
 
 const mycache = require("./src/controllers/cache.js");
 mycache.FillCache();
