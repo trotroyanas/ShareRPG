@@ -1,13 +1,18 @@
 <script>
   import Navbar from "../components/navbar.svelte";
   import Cooks from "../configs/SessionCookie.js";
-  import { goto } from "@sveltech/routify";
   import toastr from "toastr";
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
+  import { goto } from "@sveltech/routify";
+  import _ from "lodash";
+  /*  Sécurité */
   let isConnect;
-  $: isConnect = Cooks.isConnect();
+  isConnect = Cooks.isConnect();
+  if (!_.isEmpty(isConnect) || isConnect === false) {
+    $goto("/login");
+  }
 
   function logout() {
     Cooks.delCookie();

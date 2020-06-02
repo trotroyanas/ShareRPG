@@ -1,8 +1,11 @@
 <script>
   import cook from "../configs/SessionCookie.js";
   import _ from "lodash";
-
   export let Connect = cook.isConnect();
+  /*   console.log("***nav***");
+  console.log(Connect);
+  console.log("******");
+ */
 </script>
 
 <nav class="navbar navbar-expand-lg bg-secondary fixed-top" id="mainNav">

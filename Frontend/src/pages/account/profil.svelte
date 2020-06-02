@@ -6,6 +6,15 @@
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
+  import { goto } from "@sveltech/routify";
+  import _ from "lodash";
+  /*  Sécurité */
+  let isConnect;
+  isConnect = Cooks.isConnect();
+  if (!_.isEmpty(isConnect) || isConnect === false) {
+    $goto("/login");
+  }
+
   let NotifySuccessVisible = false;
   let NotifyErrorVisible = false;
   let NotifyErrorMessage = "";

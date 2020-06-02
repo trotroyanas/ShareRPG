@@ -15,7 +15,6 @@
   let NotifyClass = "";
 
   let isConnect = false;
-  //Cooks.isConnect();
 
   let email = "trotroyanas@gmail.com";
   let password = "colosus";
