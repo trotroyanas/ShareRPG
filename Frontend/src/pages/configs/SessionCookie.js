@@ -7,7 +7,7 @@ const defUnk = {
 };
 
 function defCook(ck) {
-  let date = new Date(Date.now() + 86400000 * 7); //86400000ms = 1 jour
+  let date = new Date(Date.now() + 86400000 * 5); //86400000ms = 1 jour
   let dte = date.toUTCString();
   let cs = "";
   if (ck) {
@@ -15,7 +15,10 @@ function defCook(ck) {
     let cs = "";
     cs = `token='${ckk}';path=/;expires='${dte}';SameSite=Strict`;
     document.cookie = cs;
+
+    var ts = new Date(date).getTime();
     localStorage.setItem("token", ckk);
+    localStorage.setItem("expire", ts);
     return ck;
   } else {
     console.log("pas de cookie");
@@ -31,11 +34,21 @@ const Cooks = {
     try {
       let conn = localStorage.getItem("token");
       if (!_.isEmpty(conn)) {
+        let ls = localStorage.getItem("expire");
+        var ts = new Date(Date.now()).getTime();
+        if (ts > ls) {
+          delCookie();
+          return false;
+        }
         return true;
       } else {
+        delCookie();
+
         return false;
       }
     } catch {
+      delCookie();
+
       return false;
     }
   },
@@ -46,6 +59,7 @@ const Cooks = {
   delCookie() {
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     localStorage.removeItem("token");
+    localStorage.removeItem("expire");
     localStorage.clear();
     return;
   },
@@ -68,6 +82,7 @@ const Cooks = {
       return u;
     } catch (err) {
       console.log(err);
+      return null;
     }
   },
 };

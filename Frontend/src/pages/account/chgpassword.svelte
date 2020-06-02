@@ -1,6 +1,5 @@
 <script>
   import Navbar from "../components/navbar.svelte";
-  import { goto } from "@sveltech/routify";
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "../configs/call-urls.js";
@@ -10,12 +9,18 @@
   import kapi from "../configs/cle_api.json";
   import Cooks from "../configs/SessionCookie.js";
 
+  import { goto } from "@sveltech/routify";
+  import _ from "lodash";
+  /*  Sécurité */
+  let isConnect;
+  isConnect = Cooks.isConnect();
+  if (!_.isEmpty(isConnect) || isConnect === false) {
+    $goto("/login");
+  }
+
   let NotifyVisible = false;
   let NotifyMessage = "";
   let NotifyClass = "";
-
-  let isConnect;
-  $: isConnect = Cooks.isConnect();
 
   let password = "colosus";
   let cupwd = "colosus";
@@ -35,13 +40,6 @@
     let axiosData = {
       current_password: cupwd,
       password: password
-    };
-
-    let axiosConfig = {
-      headers: {
-        "Content-Type": "application/json;charset=UTF-8",
-        "auth-token": sess
-      }
     };
 
     axios
@@ -79,7 +77,8 @@
         console.log("Catch Error");
         console.log(e);
         toastr["error"](e, "Error");
-        //$goto("/");
+        Cooks.delCookie();
+        $goto("/login");
       });
   }
 </script>
