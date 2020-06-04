@@ -43,12 +43,10 @@ const Cooks = {
         return true;
       } else {
         delCookie();
-
         return false;
       }
     } catch {
-      delCookie();
-
+      //delCookie();
       return false;
     }
   },
@@ -57,13 +55,17 @@ const Cooks = {
     return;
   },
   delCookie() {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    localStorage.removeItem("token");
-    localStorage.removeItem("expire");
-    localStorage.clear();
+    //document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("expire");
+      localStorage.clear();
+    } catch (err) {
+      console.log(err);
+    }
     return;
   },
-  readCookie() {
+  /*   readCookie() {
     try {
       //console.log("read cookie");
       let decodedCookie = decodeURIComponent(document.cookie);
@@ -75,7 +77,7 @@ const Cooks = {
       console.log("Error Read Cookie");
       return;
     }
-  },
+  }, */
   readConnected() {
     try {
       let u = localStorage.getItem("token");

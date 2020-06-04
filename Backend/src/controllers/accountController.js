@@ -6,6 +6,9 @@ const crypto = require("crypto-js");
 const cache = require("./cache.js");
 const cnx = require("./CnxBDD.js");
 
+const jwt = require("jsonwebtoken");
+const jwtpwd = require("../config/jwt.json");
+
 //Encodage SH256
 function EncPwd(pw) {
   const hash = crypto.SHA256(pw);
@@ -48,21 +51,51 @@ async function EmailExist(email) {
   }
 }
 
+async function PassCtrl(userid) {
+  try {
+    let db = await cnx.CnxDB();
+    let docRef = await db.collection("users").doc(userid);
+
+    let getDoc = await docRef
+      .get()
+      .then((doc) => {
+        if (!doc.exists) {
+          Retour.status = 1;
+          Retour.detail = "No such document!";
+        } else {
+          Retour.status = 0;
+          Retour.detail = { password: doc.data().password };
+        }
+      })
+      .catch((err) => {
+        Retour.status = 1;
+        Retour.detail = err;
+        console.log(Retour);
+      });
+    return Retour;
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err;
+    console.log(Retour);
+    return Retour;
+  }
+}
+
 exports.Get = async (req, res) => {
   try {
     //Verify cle_api
-    let kc = cache.ReadCache(req.params.cle_api);
+    /*     let kc = cache.ReadCache(req.params.cle_api);
     if (kc.status == 1) {
       console.log(kc);
       res.status(200).json(kc);
       return;
-    }
+    } */
 
-    //console.log(req.params.userId);
+    //console.log(req.params.userid);
     //Cnx BDD
     let db = cnx.CnxDB();
 
-    let docRef = await db.collection("users").doc(req.params.userId);
+    let docRef = await db.collection("users").doc(req.params.userid);
     let getDoc = docRef
       .get()
       .then((doc) => {
@@ -100,14 +133,6 @@ exports.Get = async (req, res) => {
 
 exports.Add = async (req, res) => {
   try {
-    //Verify cle_api
-    let kc = cache.ReadCache(req.body.cle_api);
-    if (kc.status == 1) {
-      console.log(kc);
-      res.status(200).json(kc);
-      return;
-    }
-
     let emExist = await EmailExist(req.body.email);
     if (emExist.status === 1) {
       //console.log("02");
@@ -173,13 +198,13 @@ exports.Del = async (req, res) => {
     let db = cnx.CnxDB();
     let deleteDoc = await db
       .collection("users")
-      .doc(req.params.userId)
+      .doc(req.params.userid)
       .delete();
     let er = {
       status: 0,
-      detail: req.params.userId,
+      detail: req.params.userid,
     };
-    console.log("userId:" + req.params.userId + " deleted.");
+    console.log("userid:" + req.params.userid + " deleted.");
     res.status(200).json(er);
   } catch (err) {
     let er = {
@@ -192,24 +217,16 @@ exports.Del = async (req, res) => {
 
 exports.Put = async (req, res) => {
   try {
-    //Verify cle_api
-    let kc = cache.ReadCache(req.params.cle_api);
-    if (kc.status == 1) {
-      console.log(kc);
-      res.status(200).json(kc);
-      return;
-    }
-
-    console.log("iuserId:" + req.params.userId);
-    console.log(req.body);
+    console.log("iuserid:" + req.params.userid);
+    //console.log(req.body);
     let db = cnx.CnxDB();
-    let updDoc = await db.collection("users").doc(req.params.userId);
+    let updDoc = await db.collection("users").doc(req.params.userid);
     let upd = updDoc.update(req.body);
     let er = {
       status: 0,
       detail: req.body,
     };
-    //console.log("userId:" + req.params.userId + " deleted.");
+    //console.log("userid:" + req.params.userid + " deleted.");
     res.status(200).json(er);
   } catch (err) {
     let er = {
@@ -223,12 +240,12 @@ exports.Put = async (req, res) => {
 exports.Check = async (req, res) => {
   try {
     //Verify cle_api
-    let kc = cache.ReadCache(req.body.cle_api);
+    /*     let kc = cache.ReadCache(req.body.cle_api);
     if (kc.status == 1) {
       console.log(kc);
       res.status(200).json(kc);
       return;
-    }
+    } */
 
     const emExist = await EmailExist(req.body.email);
     res.status(200).json(emExist);
@@ -246,12 +263,12 @@ exports.Check = async (req, res) => {
 exports.Login = async (req, res) => {
   try {
     //Verify cle_api
-    let kc = cache.ReadCache(req.body.cle_api);
+    /*     let kc = cache.ReadCache(req.body.cle_api);
     if (kc.status == 1) {
       console.log(kc);
       res.status(200).json(kc);
       return;
-    }
+    } */
 
     const passEnc = EncPwd(req.body.password);
 
@@ -275,12 +292,16 @@ exports.Login = async (req, res) => {
         } else {
           snapshot.forEach((doc) => {
             Retour.status = 0;
-            Retour.detail = {
-              userId: doc.id,
+            let obj = {
+              userid: doc.id,
               nickname: doc.data().nickname,
               email: doc.data().email,
             };
-            console.log(Retour);
+            Retour.detail = jwt.sign(obj, jwtpwd.secret, {
+              algorithm: "HS256",
+              expiresIn: 3600, // 1h
+            });
+            //console.log(Retour);
             res.status(200).json(Retour);
             return;
           });
@@ -293,5 +314,40 @@ exports.Login = async (req, res) => {
     console.log(Retour);
     res.status(500).json(Retour);
     return;
+  }
+};
+
+exports.ChgPwd = async (req, res) => {
+  try {
+    let token = req.headers.authorization.substring(7);
+    var decoded = await jwt.verify(token, jwtpwd.secret);
+    const userid = decoded.userid;
+
+    let user = await PassCtrl(userid);
+    const cupwd = EncPwd(req.body.current_password); // current password pour Verif vs User.detail.password
+    const Npwd = {
+      password: EncPwd(req.body.password), // nouveau password encodé
+    };
+
+    if (user.status === 0 && user.detail.password === cupwd) {
+      // comparaison des passwords
+      let db = await cnx.CnxDB();
+      let updDoc = await db.collection("users").doc(decoded.userid);
+      let upd = await updDoc.update(Npwd);
+
+      Retour.status = 0;
+      Retour.detail = "Password updated.";
+      res.status(200).json(Retour);
+      return;
+    } else {
+      Retour.status = 1;
+      Retour.detail = "Invalid password";
+      res.status(200).json(Retour);
+      return;
+    }
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err;
+    res.status(500).json(Retour);
   }
 };

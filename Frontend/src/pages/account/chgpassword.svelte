@@ -33,9 +33,7 @@
       e.target.reset();
       return;
     }
-
-    let sess = Cooks.readConnected();
-    console.log(sess);
+    let sess = await Cooks.readConnected();
 
     let axiosData = {
       current_password: cupwd,
@@ -50,27 +48,19 @@
         }
       })
       .then(r => {
-        //console.log(r.data);
         if (r.data.status === 0) {
-          let msg = "You're connected";
+          let msg = r.data.detail;
           toastr["success"](msg, "Success");
           NotifyVisible = true;
           NotifyMessage = "Succes : " + msg;
           NotifyClass = "notify-success";
           e.target.reset();
-          //console.log(r.data.detail);
-          //isConnect = true;
-          //$goto("/account/home");
-
-          //window.location.replace("/account/account");
-          //location.reload();
         } else {
           toastr["error"](r.data.detail, "Error");
           NotifyMessage = r.data.detail;
           NotifyVisible = true;
           NotifyClass = "notify-error";
-          Cooks.delCookie();
-          isConnect = false;
+          e.target.reset();
         }
       })
       .catch(e => {
