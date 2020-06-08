@@ -1,4 +1,4 @@
-import _ from "lodash";
+let TokenExp = null;
 
 const defUnk = {
   userid: "0",
@@ -6,47 +6,44 @@ const defUnk = {
   email: "unknow@unknow.com",
 };
 
-function defCook(ck) {
-  let date = new Date(Date.now() + 86400000 * 5); //86400000ms = 1 jour
-  let dte = date.toUTCString();
-  let cs = "";
-  if (ck) {
-    let ckk = ck.toString();
-    let cs = "";
-    cs = `token='${ckk}';path=/;expires='${dte}';SameSite=Strict`;
-    document.cookie = cs;
+function retGetTime(v) {
+  return Math.floor(v / 1000);
+}
 
-    var ts = new Date(date).getTime();
-    localStorage.setItem("token", ckk);
+function defCook(ck) {
+  let ts = retGetTime(new Date(Date.now()).getTime() + 1000 * 120); // 1000ms * 120s
+  if (ck) {
+    localStorage.setItem("token", ck.toString());
     localStorage.setItem("expire", ts);
     return ck;
   } else {
-    console.log("pas de cookie");
-    delCookie();
+    console.log("pas de cookiepas de localStorage");
+    delLS();
     return;
   }
-  //console.log(cs);
-  return cs;
+  return;
 }
 
 const Cooks = {
   isConnect() {
     try {
       let conn = localStorage.getItem("token");
-      if (!_.isEmpty(conn)) {
+      if (conn) {
         let ls = localStorage.getItem("expire");
-        var ts = new Date(Date.now()).getTime();
+        var ts = retGetTime(new Date(Date.now()).getTime());
+        //console.log(ls);
+        //console.log(ts);
         if (ts > ls) {
-          delCookie();
+          delLS();
           return false;
         }
         return true;
       } else {
-        delCookie();
+        delLS();
         return false;
       }
     } catch {
-      //delCookie();
+      //delLS();
       return false;
     }
   },
@@ -54,7 +51,7 @@ const Cooks = {
     defCook(v);
     return;
   },
-  delCookie() {
+  delLS() {
     //document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     try {
       localStorage.removeItem("token");

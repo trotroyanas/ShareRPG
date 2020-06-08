@@ -262,14 +262,6 @@ exports.Check = async (req, res) => {
 
 exports.Login = async (req, res) => {
   try {
-    //Verify cle_api
-    /*     let kc = cache.ReadCache(req.body.cle_api);
-    if (kc.status == 1) {
-      console.log(kc);
-      res.status(200).json(kc);
-      return;
-    } */
-
     const passEnc = EncPwd(req.body.password);
 
     let db = cnx.CnxDB();
@@ -299,7 +291,7 @@ exports.Login = async (req, res) => {
             };
             Retour.detail = jwt.sign(obj, jwtpwd.secret, {
               algorithm: "HS256",
-              expiresIn: 3600, // 1h
+              expiresIn: 120, // 1h
             });
             //console.log(Retour);
             res.status(200).json(Retour);
@@ -334,7 +326,6 @@ exports.ChgPwd = async (req, res) => {
       let db = await cnx.CnxDB();
       let updDoc = await db.collection("users").doc(decoded.userid);
       let upd = await updDoc.update(Npwd);
-
       Retour.status = 0;
       Retour.detail = "Password updated.";
       res.status(200).json(Retour);

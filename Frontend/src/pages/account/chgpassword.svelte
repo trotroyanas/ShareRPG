@@ -10,11 +10,11 @@
   import Cooks from "../configs/SessionCookie.js";
 
   import { goto } from "@sveltech/routify";
-  import _ from "lodash";
+
   /*  Sécurité */
   let isConnect;
   isConnect = Cooks.isConnect();
-  if (!_.isEmpty(isConnect) || isConnect === false) {
+  if (!isConnect) {
     $goto("/login");
   }
 

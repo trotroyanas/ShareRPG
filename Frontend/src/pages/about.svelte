@@ -8,7 +8,7 @@
     $goto("/account/login");
   }
   function logout() {
-    cook.delCookie();
+    cook.delLS();
     window.location.replace("/");
     //$goto("/");
   }
