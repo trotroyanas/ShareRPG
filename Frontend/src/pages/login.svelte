@@ -7,7 +7,6 @@
   import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
 
-  import kapi from "./configs/cle_api.json";
   import Cooks from "./configs/SessionCookie.js";
 
   let NotifyVisible = false;

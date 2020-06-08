@@ -3,7 +3,6 @@
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "./configs/call-urls.js";
-  import kapi from "./configs/cle_api.json";
   import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
 
@@ -38,8 +37,7 @@
         nickname: user.nickname,
         lastname: user.lastname,
         name: user.name,
-        password: user.password,
-        cle_api: kapi.cle_api
+        password: user.password
       })
       .then(r => {
         //console.log(r.data);

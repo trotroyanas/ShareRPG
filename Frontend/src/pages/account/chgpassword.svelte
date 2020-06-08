@@ -6,7 +6,6 @@
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
-  import kapi from "../configs/cle_api.json";
   import Cooks from "../configs/SessionCookie.js";
 
   import { goto } from "@sveltech/routify";

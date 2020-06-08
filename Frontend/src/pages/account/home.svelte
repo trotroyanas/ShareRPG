@@ -15,7 +15,7 @@
   }
 
   function logout() {
-    Cooks.delCookie();
+    Cooks.delLS();
     toastr["success"]("You're disconnected", "Success");
     $goto("/login");
   }
