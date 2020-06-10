@@ -8,16 +8,18 @@ const verify = require("./verifyToken.js");
 /** Account */
 
 router.get("/get/:userid", verify.auth, accountController.Get);
-router.delete("/del/:userid", accountController.Del);
+router.post("/add", verify.auth, accountController.Add);
 router.put("/put/:userid", verify.auth, accountController.Put);
-router.post("/add", accountController.Add);
 router.post("/chgpwd", verify.auth, accountController.ChgPwd);
-
+router.get("/emailexist/:email/:userid?", verify.auth, accountController.EmailExist);
 router.get("/profil/:userid", verify.auth, accountController.Profil);
 router.get("/renew", verify.auth, accountController.ReNew);
 
+router.delete("/del/:userid", accountController.Del);
+
 router.post("/login", accountController.Login);
-router.get("/emailexist/:email/:userid?", accountController.EmailExist);
+router.get("/maketoken", accountController.makeToken);
+
 /** end Account */
 
 module.exports = router;

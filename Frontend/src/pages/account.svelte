@@ -4,6 +4,8 @@
   import axios from "axios";
   import Urls from "./configs/call-urls.js";
   import { goto } from "@sveltech/routify";
+  import Cooks from "./configs/SessionCookie.js";
+
   import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
 
@@ -32,22 +34,40 @@
       return;
     }
 
+    const tt = await axios.get(Urls.maketoken);
+    const tmpToken = tt.data.detail;
+    //console.log("tmpToken:", tmpToken);
+
     const valid = await axios
-      .get(Urls.emailexist + "/" + user.email)
+      .get(Urls.emailexist + "/" + user.email, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + tmpToken
+        }
+      })
       .then(async ret => {
         console.log(ret.data);
         if (ret.data.status === 0) {
           await axios
-            .post(Urls.add, {
-              email: user.email,
-              nickname: user.nickname,
-              lastname: user.lastname,
-              name: user.name,
-              password: user.password,
-              valid: false
-            })
+            .post(
+              Urls.add,
+              {
+                email: user.email,
+                nickname: user.nickname,
+                lastname: user.lastname,
+                name: user.name,
+                password: user.password,
+                valid: false
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + tmpToken
+                }
+              }
+            )
             .then(rr => {
-              console.log(rr.data);
+              //console.log(rr.data);
               if (rr.data.status === 0) {
                 toastr["success"]("Add Account", "Success");
                 NotifySuccessVisible = true;
@@ -57,7 +77,7 @@
                 $goto("/login");
                 return;
               } else {
-                NotifyErrorMessage = r.data.detail;
+                NotifyErrorMessage = rr.data.detail;
                 NotifySuccessVisible = false;
                 NotifyErrorVisible = true;
                 toastr["error"](NotifyErrorMessage, "Error");
@@ -73,7 +93,7 @@
               return;
             });
         } else {
-          NotifyErrorMessage = e.data.detail;
+          NotifyErrorMessage = ret.data.detail;
           NotifySuccessVisible = false;
           NotifyErrorVisible = true;
           toastr["error"](NotifyErrorMessage, "Error");

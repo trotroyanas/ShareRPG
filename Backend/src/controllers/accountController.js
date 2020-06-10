@@ -401,3 +401,26 @@ exports.ReNew = async (req, res) => {
     return;
   }
 };
+
+exports.makeToken = async (req, res) => {
+  try {
+    let obj = {
+      userid: "0",
+      nickname: "tmp",
+      email: "tmp@tmp.com",
+    };
+    Retour.status = 0;
+    Retour.detail = jwt.sign(obj, jwtpwd.secret, {
+      algorithm: "HS256",
+      expiresIn: 3600,
+    });
+    res.status(200).json(Retour);
+    return;
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err;
+    console.log(Retour);
+    res.status(500).json(Retour);
+    return;
+  }
+};

@@ -79,7 +79,12 @@
     //console.log(Urls.emailexist);
 
     const valid = await axios
-      .get(Urls.emailexist + "/" + user.email + "/" + userid)
+      .get(Urls.emailexist + "/" + user.email + "/" + userid, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token
+        }
+      })
       .then(async e => {
         if (e.data.status === 0) {
           if (emailOri != user.email) user.valid = false; //bascule a false si l'email change

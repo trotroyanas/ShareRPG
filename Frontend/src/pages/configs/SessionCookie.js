@@ -1,12 +1,6 @@
 let TokenExp = 24; //hours
 import base64 from "base-64";
 
-const defUnk = {
-  userid: "0",
-  nickname: "unknow",
-  email: "unknow@unknow.com",
-};
-
 function retGetTime(v) {
   return Math.floor(v / 1000);
 }
@@ -21,7 +15,7 @@ function defCook(ck) {
     localStorage.setItem("expire", ts);
     return ck;
   } else {
-    console.log("pas de cookiepas de localStorage");
+    console.log("no value in localStorage");
     delLS();
     return;
   }

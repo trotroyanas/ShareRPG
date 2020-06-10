@@ -8,6 +8,7 @@ const Urls = {
   profil: "http://localhost:3000/api/account/profil",
   renew: "http://localhost:3000/api/account/renew",
   emailexist: "http://localhost:3000/api/account/emailexist",
+  maketoken: "http://localhost:3000/api/account/maketoken",
 };
 
 export default Urls;
