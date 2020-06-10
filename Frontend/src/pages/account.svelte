@@ -3,6 +3,7 @@
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "./configs/call-urls.js";
+  import { goto } from "@sveltech/routify";
   import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
 
@@ -31,38 +32,59 @@
       return;
     }
 
-    await axios
-      .post(Urls.add, {
-        email: user.email,
-        nickname: user.nickname,
-        lastname: user.lastname,
-        name: user.name,
-        password: user.password
-      })
-      .then(r => {
-        //console.log(r.data);
-        if (r.data.status === 0) {
-          toastr["success"]("Add Account", "Success");
-          NotifySuccessVisible = true;
-          NotifyErrorVisible = false;
-          //Reset les champs du formulaire sur success
-          e.target.reset();
-          return;
+    const valid = await axios
+      .get(Urls.emailexist + "/" + user.email)
+      .then(async ret => {
+        console.log(ret.data);
+        if (ret.data.status === 0) {
+          await axios
+            .post(Urls.add, {
+              email: user.email,
+              nickname: user.nickname,
+              lastname: user.lastname,
+              name: user.name,
+              password: user.password,
+              valid: false
+            })
+            .then(rr => {
+              console.log(rr.data);
+              if (rr.data.status === 0) {
+                toastr["success"]("Add Account", "Success");
+                NotifySuccessVisible = true;
+                NotifyErrorVisible = false;
+                //Reset les champs du formulaire sur success
+                //e.target.reset();
+                $goto("/login");
+                return;
+              } else {
+                NotifyErrorMessage = r.data.detail;
+                NotifySuccessVisible = false;
+                NotifyErrorVisible = true;
+                toastr["error"](NotifyErrorMessage, "Error");
+                return;
+              }
+            })
+            .catch(er => {
+              NotifyErrorMessage = er.message;
+              NotifySuccessVisible = false;
+              NotifyErrorVisible = true;
+              toastr["error"]("Error unknow", "Error");
+              console.log(NotifyErrorMessage);
+              return;
+            });
         } else {
-          NotifyErrorMessage = r.data.detail;
+          NotifyErrorMessage = e.data.detail;
           NotifySuccessVisible = false;
           NotifyErrorVisible = true;
           toastr["error"](NotifyErrorMessage, "Error");
-          return;
         }
       })
-      .catch(e => {
-        NotifyErrorMessage = e;
+      .catch(er => {
+        NotifyErrorMessage = er.message;
         NotifySuccessVisible = false;
         NotifyErrorVisible = true;
-        toastr["error"]("Error unknow", "Error");
-        console.log(e);
-        return;
+        toastr["error"](NotifyErrorMessage, "Error");
+        console.log(er.message);
       });
   }
 </script>

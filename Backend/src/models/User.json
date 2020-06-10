@@ -1,9 +1,10 @@
- {
-   "email": "",
-   "nickname": "",
-   "name": "",
-   "lastname": "",
-   "password": "",
-   "created": null,
-   "timestamp": null
- }
+{
+  "email": "",
+  "nickname": "",
+  "name": "",
+  "lastname": "",
+  "password": "",
+  "created": null,
+  "timestamp": null,
+  "valid": false
+}

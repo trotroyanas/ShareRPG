@@ -48,7 +48,7 @@
           NotifyMessage = r.data.detail;
           NotifyVisible = true;
           NotifyClass = "notify-error";
-          Cooks.delCookie();
+          Cooks.delLS();
           isConnect = false;
         }
       })

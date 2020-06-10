@@ -1,4 +1,5 @@
-let TokenExp = null;
+let TokenExp = 24; //hours
+import base64 from "base-64";
 
 const defUnk = {
   userid: "0",
@@ -11,7 +12,10 @@ function retGetTime(v) {
 }
 
 function defCook(ck) {
-  let ts = retGetTime(new Date(Date.now()).getTime() + 1000 * 3600); // 1000ms * 120s
+  var dt = new Date(Date.now());
+  dt.setHours(dt.getHours() + TokenExp);
+  let ts = retGetTime(dt.getTime());
+  //console.log(ts);
   if (ck) {
     localStorage.setItem("token", ck.toString());
     localStorage.setItem("expire", ts);
@@ -31,6 +35,7 @@ const Cooks = {
       if (conn) {
         let ls = localStorage.getItem("expire");
         var ts = retGetTime(new Date(Date.now()).getTime());
+        //console.log("compare");
         //console.log(ls);
         //console.log(ts);
         if (ts > ls) {
@@ -63,16 +68,9 @@ const Cooks = {
     return;
   },
   decPayload(token) {
-    var base64Url = token.split(".")[1];
-    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    var jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map(function (c) {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join("")
-    );
+    const tok = token.split(".");
+    var jsonPayload = base64.decode(tok[1]);
+    //console.log(decodedData);
     return JSON.parse(jsonPayload);
   },
   rUserid() {

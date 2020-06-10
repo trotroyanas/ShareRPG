@@ -6,6 +6,8 @@ const Urls = {
   add: "http://localhost:3000/api/account/add",
   chgpwd: "http://localhost:3000/api/account/chgpwd",
   profil: "http://localhost:3000/api/account/profil",
+  renew: "http://localhost:3000/api/account/renew",
+  emailexist: "http://localhost:3000/api/account/emailexist",
 };
 
 export default Urls;

@@ -16,6 +16,7 @@
     $goto("/login");
   }
 
+  let emailOri = "";
   let NotifySuccessVisible = false;
   let NotifyErrorVisible = false;
   let NotifyErrorMessage = "";
@@ -29,10 +30,13 @@
     email: "",
     nickname: "",
     lastname: "",
-    name: ""
+    name: "",
+    valid: true
   };
 
   async function load() {
+    //console.log(userid);
+    //console.log(token);
     await axios
       .get(Urls.profil + "/" + userid, {
         headers: {
@@ -47,6 +51,7 @@
           user.nickname = r.data.detail.nickname;
           user.lastname = r.data.detail.lastname;
           user.name = r.data.detail.name;
+          emailOri = r.data.detail.email;
           return;
         } else {
           NotifyErrorMessage = r.data.detail;
@@ -69,47 +74,70 @@
   async function formSubmit(e) {
     // donne les options à toastr
 
-    await axios
-      .put(
-        Urls.put + "/" + userid,
-        {
-          email: user.email,
-          nickname: user.nickname,
-          lastname: user.lastname,
-          name: user.name
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token
-          }
-        }
-      )
-      .then(r => {
-        //console.log(r.data);
-        if (r.data.status === 0) {
-          toastr["success"]("Account Updated", "Success");
-          NotifySuccessVisible = true;
-          NotifyErrorVisible = false;
-          //Reset les champs du formulaire sur success
-          $goto("/account/home");
-          return;
+    //console.log(user.email);
+    //console.log(userid);
+    //console.log(Urls.emailexist);
+
+    const valid = await axios
+      .get(Urls.emailexist + "/" + user.email + "/" + userid)
+      .then(async e => {
+        if (e.data.status === 0) {
+          if (emailOri != user.email) user.valid = false; //bascule a false si l'email change
+          await axios
+            .put(
+              Urls.put + "/" + userid,
+              {
+                email: user.email,
+                nickname: user.nickname,
+                lastname: user.lastname,
+                name: user.name,
+                valid: user.valid
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + token
+                }
+              }
+            )
+            .then(r => {
+              //console.log(r.data);
+              if (r.data.status === 0) {
+                toastr["success"]("Account Updated", "Success");
+                NotifySuccessVisible = true;
+                NotifyErrorVisible = false;
+                //Reset les champs du formulaire sur success
+                if (user.valid === false) {
+                  $goto("/validemail");
+                  return;
+                }
+                $goto("/account/home");
+                return;
+              } else {
+                NotifyErrorMessage = r.data.detail;
+                NotifySuccessVisible = false;
+                NotifyErrorVisible = true;
+                toastr["error"](NotifyErrorMessage, "Error");
+                return;
+              }
+            })
+            .catch(e => {
+              NotifyErrorMessage = e;
+              NotifySuccessVisible = false;
+              NotifyErrorVisible = true;
+              toastr["error"]("Error unknow", "Error");
+              console.log(e);
+              return;
+            });
         } else {
-          NotifyErrorMessage = r.data.detail;
+          NotifyErrorMessage = e.data.detail;
           NotifySuccessVisible = false;
           NotifyErrorVisible = true;
           toastr["error"](NotifyErrorMessage, "Error");
           return;
         }
       })
-      .catch(e => {
-        NotifyErrorMessage = e;
-        NotifySuccessVisible = false;
-        NotifyErrorVisible = true;
-        toastr["error"]("Error unknow", "Error");
-        console.log(e);
-        return;
-      });
+      .catch(er => console.log(er.message));
   }
 
   load();

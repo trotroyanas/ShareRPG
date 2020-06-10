@@ -624,13 +624,13 @@ pre code {
 
     .BodyRoutify {
         margin-top: 104px;
-        min-height: calc(100vh - (104px + 362px + 72px));
-
+        border: solid 1px orange;
+        min-height: calc(100vh - (104px + 48px + 272px + 72px));
     }    
 
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 2000px) {
     .container {
         max-width: 1140px;
     }

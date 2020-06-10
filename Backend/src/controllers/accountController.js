@@ -8,6 +8,9 @@ const cnx = require("./CnxBDD.js");
 
 const jwt = require("jsonwebtoken");
 const jwtpwd = require("../config/jwt.json");
+const base64 = require("base-64");
+
+const ExpToken = 3600 * 24;
 
 //Encodage SH256
 function EncPwd(pw) {
@@ -17,7 +20,18 @@ function EncPwd(pw) {
 }
 
 // Check email //
-async function EmailExist(email) {
+exports.EmailExist = async (req, res) => {
+  let email = req.params.email;
+  let userid = "";
+  try {
+    userid = req.params.userid;
+  } catch (e) {
+    console.log(e.messsage);
+  }
+
+  //console.log(email);
+  //console.log(userid);
+
   try {
     //Cnx BDD
     let db = await cnx.CnxDB();
@@ -25,7 +39,6 @@ async function EmailExist(email) {
 
     await docRef
       .where("email", "==", email)
-      //.orderBy('timestamp')
       .limit(1)
       .get()
       .then((snapshot) => {
@@ -33,23 +46,33 @@ async function EmailExist(email) {
           //console.log("email non trouvé");
           Retour.status = 0;
           Retour.detail = "email not found";
+          res.status(200).json(Retour);
+          return;
         } else {
           snapshot.forEach((doc) => {
-            console.log(doc.id, "=>", doc.data());
+            if (userid === doc.id) {
+              Retour.status = 0;
+              Retour.detail = "Update Possible";
+              res.status(200).json(Retour);
+              return;
+            } else {
+              Retour.status = 1;
+              Retour.detail = "email already exist";
+              res.status(200).json(Retour);
+              return;
+            }
           });
-          Retour.status = 1;
-          Retour.detail = "email already exist";
         }
       });
-    //console.log("fin :" + Ret);
-    return Retour;
   } catch (err) {
+    console.log("error");
     Retour.status = 1;
-    Retour.detail = err;
+    Retour.detail = err.message;
     console.log(Retour);
-    return Retour;
+    res.status(500).json(Retour);
+    return;
   }
-}
+};
 
 async function PassCtrl(userid) {
   try {
@@ -79,6 +102,13 @@ async function PassCtrl(userid) {
     console.log(Retour);
     return Retour;
   }
+}
+
+function DecToken(token) {
+  const tok = token.split(".");
+  var jsonPayload = base64.decode(tok[1]);
+  //console.log(decodedData);
+  return JSON.parse(jsonPayload);
 }
 
 exports.Get = async (req, res) => {
@@ -124,16 +154,6 @@ exports.Get = async (req, res) => {
 
 exports.Add = async (req, res) => {
   try {
-    let emExist = await EmailExist(req.body.email);
-    if (emExist.status === 1) {
-      //console.log("02");
-      Retour = emExist;
-      console.log(Retour);
-      res.status(200).json(Retour);
-      return Retour;
-    }
-    //console.log("03");
-
     //recupère les chammps du modèle
     let nUser = User;
     Object.keys(nUser).forEach((key) => {
@@ -187,10 +207,7 @@ exports.Del = async (req, res) => {
     }
 
     let db = cnx.CnxDB();
-    let deleteDoc = await db
-      .collection("users")
-      .doc(req.params.userid)
-      .delete();
+    let deleteDoc = await db.collection("users").doc(req.params.userid).delete();
     let er = {
       status: 0,
       detail: req.params.userid,
@@ -208,7 +225,7 @@ exports.Del = async (req, res) => {
 
 exports.Put = async (req, res) => {
   try {
-    console.log("iuserid:" + req.params.userid);
+    //console.log("iuserid:" + req.params.userid);
     //console.log(req.body);
     let db = cnx.CnxDB();
     let updDoc = await db.collection("users").doc(req.params.userid);
@@ -228,29 +245,6 @@ exports.Put = async (req, res) => {
   }
 };
 
-exports.Check = async (req, res) => {
-  try {
-    //Verify cle_api
-    /*     let kc = cache.ReadCache(req.body.cle_api);
-    if (kc.status == 1) {
-      console.log(kc);
-      res.status(200).json(kc);
-      return;
-    } */
-
-    const emExist = await EmailExist(req.body.email);
-    res.status(200).json(emExist);
-    return;
-  } catch (err) {
-    let er = {
-      status: 1,
-      detail: err,
-    };
-    res.status(500).json(er);
-    return;
-  }
-};
-
 exports.Login = async (req, res) => {
   try {
     const passEnc = EncPwd(req.body.password);
@@ -261,6 +255,7 @@ exports.Login = async (req, res) => {
     await docRef
       .where("email", "==", req.body.email)
       .where("password", "==", passEnc)
+      //.where("valid", "==", true)
       //.orderBy('timestamp')
       .limit(1)
       .get()
@@ -274,19 +269,26 @@ exports.Login = async (req, res) => {
           return;
         } else {
           snapshot.forEach((doc) => {
-            Retour.status = 0;
-            let obj = {
-              userid: doc.id,
-              nickname: doc.data().nickname,
-              email: doc.data().email,
-            };
-            Retour.detail = jwt.sign(obj, jwtpwd.secret, {
-              algorithm: "HS256",
-              expiresIn: 3600, // 1h
-            });
+            if (doc.data().valid === true) {
+              Retour.status = 0;
+              let obj = {
+                userid: doc.id,
+                nickname: doc.data().nickname,
+                email: doc.data().email,
+              };
+              Retour.detail = jwt.sign(obj, jwtpwd.secret, {
+                algorithm: "HS256",
+                expiresIn: ExpToken,
+              });
+              res.status(200).json(Retour);
+              return;
+            } else {
+              Retour.status = 1;
+              Retour.detail = "email not validated";
+              res.status(200).json(Retour);
+              return;
+            }
             //console.log(Retour);
-            res.status(200).json(Retour);
-            return;
           });
         }
       });
@@ -363,6 +365,34 @@ exports.Profil = async (req, res) => {
         res.status(500).json(Retour);
         return;
       });
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err;
+    console.log(Retour);
+    res.status(500).json(Retour);
+    return;
+  }
+};
+
+exports.ReNew = async (req, res) => {
+  try {
+    let token = req.headers.authorization.substring(7);
+    console.log(token);
+    const PayLoad = DecToken(token);
+
+    Retour.status = 0;
+    let obj = {
+      userid: PayLoad.userid,
+      nickname: PayLoad.nickname,
+      email: PayLoad.email,
+    };
+    Retour.detail = jwt.sign(obj, jwtpwd.secret, {
+      algorithm: "HS256",
+      expiresIn: ExpToken,
+    });
+
+    res.status(200).json(Retour);
+    return;
   } catch (err) {
     Retour.status = 1;
     Retour.detail = err;
