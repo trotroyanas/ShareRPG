@@ -10,6 +10,9 @@ const jwt = require("jsonwebtoken");
 const jwtpwd = require("../config/jwt.json");
 const base64 = require("base-64");
 
+const aws = require("./sendEmail.js");
+const template = require("../templates/emails.json");
+
 const ExpToken = 3600 * 24;
 
 //Encodage SH256
@@ -176,12 +179,25 @@ exports.Add = async (req, res) => {
     docRef
       .set(nUser)
       .then((e) => {
-        console.log("success : ");
+        console.log("success : add account");
         Retour.detail = {
           ...nUser,
           id: uuid,
         };
-        res.status(200).send(Retour);
+        let nacc = template.new_account.replace("%nickname%", nUser.nickname);
+        aws
+          .SendEmailAws("contact@deco-recup.fr", nUser.email, "ShareRPG : create account", nacc)
+          .then((e) => {
+            console.log("email Send");
+            console.log("e:", e.MessageId);
+            res.status(200).send(Retour);
+          })
+          .catch((err) => {
+            console.log(err.message);
+            Retour.status = 1;
+            Retour.detail = err.message;
+            res.status(200).send(Retour);
+          });
       })
       .catch((err) => {
         Retour.status = 1;
