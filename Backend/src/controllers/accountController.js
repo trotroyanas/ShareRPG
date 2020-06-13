@@ -22,6 +22,14 @@ function EncPwd(pw) {
   return npwd;
 }
 
+function makeTokenTmp(obj) {
+  const tok = jwt.sign(obj, jwtpwd.secret, {
+    algorithm: "HS256",
+    expiresIn: 3600,
+  });
+  return tok;
+}
+
 // Check email //
 exports.EmailExist = async (req, res) => {
   let email = req.params.email;
@@ -173,18 +181,25 @@ exports.Add = async (req, res) => {
 
     //Cnx BDD
     let db = cnx.CnxDB();
-
     const uuid = uuidv4();
     let docRef = await db.collection("users").doc(uuid);
     docRef
       .set(nUser)
       .then((e) => {
         console.log("success : add account");
+        Retour.status = 0;
         Retour.detail = {
-          ...nUser,
-          id: uuid,
+          email: nUser.email,
+          nickname: nUser.nickname,
+          userid: uuid,
         };
-        let nacc = template.new_account.replace("%nickname%", nUser.nickname);
+
+        //make Tmp token
+        let tokenTmp = makeTokenTmp(Retour.detail);
+
+        //make template
+        let nacc = template.new_account.replace("%nickname%", nUser.nickname).replace("%tokenTmp%", tokenTmp).replace("%tokenTmp%", tokenTmp);
+        //send email
         aws
           .SendEmailAws("contact@deco-recup.fr", nUser.email, "ShareRPG : create account", nacc)
           .then((e) => {
@@ -425,11 +440,35 @@ exports.makeToken = async (req, res) => {
       nickname: "tmp",
       email: "tmp@tmp.com",
     };
+    const tokTmp = await makeTokenTmp(obj);
     Retour.status = 0;
-    Retour.detail = jwt.sign(obj, jwtpwd.secret, {
-      algorithm: "HS256",
-      expiresIn: 3600,
-    });
+    Retour.detail = tokTmp;
+    res.status(200).json(Retour);
+    return;
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err;
+    console.log(Retour);
+    res.status(500).json(Retour);
+    return;
+  }
+};
+
+exports.validMail = async (req, res) => {
+  try {
+    let token = req.headers.authorization.substring(7);
+    var decoded = await jwt.verify(token, jwtpwd.secret);
+    const userid = decoded.userid;
+
+    //Cnx BDD
+    let db = cnx.CnxDB();
+
+    let updDoc = await db.collection("users").doc(userid);
+    let upd = updDoc.update({ valid: true });
+
+    Retour.status = 0;
+    Retour.detail = "Account confirmed";
+
     res.status(200).json(Retour);
     return;
   } catch (err) {

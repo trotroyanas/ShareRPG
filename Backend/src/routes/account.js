@@ -19,6 +19,7 @@ router.delete("/del/:userid", accountController.Del);
 
 router.post("/login", accountController.Login);
 router.get("/maketoken", accountController.makeToken);
+router.get("/validmail", verify.auth, accountController.validMail);
 
 /** end Account */
 
