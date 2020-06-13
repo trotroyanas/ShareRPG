@@ -1,4 +1,5 @@
-let Retour = require("../models/retour.json");
+const { Ret } = require("../models/classes.js");
+
 const { v4: uuidv4 } = require("uuid");
 
 const User = require("../models/User.json");
@@ -14,13 +15,6 @@ const aws = require("./sendEmail.js");
 const template = require("../templates/emails.json");
 
 const ExpToken = 3600 * 24;
-
-class Ret {
-  constructor(status, detail) {
-    this.status = status;
-    this.detail = detail;
-  }
-}
 
 //Encodage SH256
 function EncPwd(pw) {
@@ -78,22 +72,21 @@ async function PassCtrl(userid) {
       .get()
       .then((doc) => {
         if (!doc.exists) {
-          Retour.status = 1;
-          Retour.detail = "No such document!";
+          const Retour = new Ret(1, "No such document!");
+          return Retour;
         } else {
-          Retour.status = 0;
-          Retour.detail = { password: doc.data().password };
+          const Retour = new Ret(0, { password: doc.data().password });
+          return Retour;
         }
       })
       .catch((err) => {
-        Retour.status = 1;
-        Retour.detail = err;
+        const Retour = new Ret(1, err.message);
         console.log(Retour);
+        return Retour;
       });
-    return Retour;
+    s;
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
+    const Retour = new Ret(1, err.message);
     console.log(Retour);
     return Retour;
   }
@@ -128,20 +121,17 @@ exports.EmailExist = async (req, res) => {
       .then((snapshot) => {
         if (snapshot.empty) {
           //console.log("email non trouvé");
-          Retour.status = 0;
-          Retour.detail = "email not found";
+          const Retour = new Ret(0, "email not found");
           res.status(200).json(Retour);
           return;
         } else {
           snapshot.forEach((doc) => {
             if (userid === doc.id) {
-              Retour.status = 0;
-              Retour.detail = "Update Possible";
+              const Retour = new Ret(0, "Update Possible");
               res.status(200).json(Retour);
               return;
             } else {
-              Retour.status = 1;
-              Retour.detail = "email already exist";
+              const Retour = new Ret(1, "email already exist");
               res.status(200).json(Retour);
               return;
             }
@@ -149,10 +139,8 @@ exports.EmailExist = async (req, res) => {
         }
       });
   } catch (err) {
-    console.log("error");
-    Retour.status = 1;
-    Retour.detail = err.message;
-    console.log(Retour);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
     res.status(500).json(Retour);
     return;
   }
@@ -168,33 +156,31 @@ exports.Get = async (req, res) => {
       .get()
       .then((doc) => {
         if (!doc.exists) {
-          Retour.status = 1;
-          Retour.detail = "No such document!";
+          const Retour = new Ret(1, "No such document!");
+          console.log(Retour);
           res.status(500).json(Retour);
           return;
         } else {
           //console.log('Document data:', doc.data());
-          Retour.status = 0;
-          Retour.detail = {
+          const Retour = new Ret(0, {
             nickname: doc.data().nickname,
             email: doc.data().email,
-          };
+          });
           res.status(200).json(Retour);
           return;
         }
       })
       .catch((err) => {
-        Retour.status = 1;
-        Retour.detail = err;
+        const Retour = new Ret(1, err.message);
         console.log(Retour);
         res.status(500).json(Retour);
         return;
       });
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
+    const Retour = new Ret(1, err.message);
     console.log(Retour);
     res.status(500).json(Retour);
+    return;
     return;
   }
 };
@@ -223,12 +209,12 @@ exports.Add = async (req, res) => {
       .set(nUser)
       .then((e) => {
         console.log("success : add account");
-        Retour.status = 0;
-        Retour.detail = {
+
+        const Retour = new Ret(0, {
           email: nUser.email,
           nickname: nUser.nickname,
           userid: uuid,
-        };
+        });
 
         //make Tmp token
         let tokenTmp = makeTokenTmp(Retour.detail);
@@ -244,22 +230,20 @@ exports.Add = async (req, res) => {
             res.status(200).send(Retour);
           })
           .catch((err) => {
-            console.log(err.message);
-            Retour.status = 1;
-            Retour.detail = err.message;
+            const Retour = new Ret(1, err.message);
+            console.log(Retour);
             res.status(200).send(Retour);
           });
       })
       .catch((err) => {
-        Retour.status = 1;
-        Retour.detail = err;
-        res.status(500).json(Retour);
+        const Retour = new Ret(1, err.message);
+        console.log(Retour);
+        res.status(500).send(Retour);
       });
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
-    console.log(err);
-    res.status(500).json(Retour);
+    const Retour = new Ret(1, err.message);
+    console.log(Retour);
+    res.status(500).send(Retour);
   }
 };
 
@@ -272,21 +256,16 @@ exports.Del = async (req, res) => {
       res.status(200).json(kc);
       return;
     }
-
     let db = cnx.CnxDB();
     let deleteDoc = await db.collection("users").doc(req.params.userid).delete();
-    let er = {
-      status: 0,
-      detail: req.params.userid,
-    };
+
+    const Retour = new Ret(1, req.params.userid);
     console.log("userid:" + req.params.userid + " deleted.");
-    res.status(200).json(er);
+    res.status(200).json(Retour);
   } catch (err) {
-    let er = {
-      status: 1,
-      detail: err,
-    };
-    res.status(500).json(er);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
+    res.status(500).json(Retour);
   }
 };
 
@@ -297,18 +276,14 @@ exports.Put = async (req, res) => {
     let db = cnx.CnxDB();
     let updDoc = await db.collection("users").doc(req.params.userid);
     let upd = updDoc.update(req.body);
-    let er = {
-      status: 0,
-      detail: req.body,
-    };
-    //console.log("userid:" + req.params.userid + " deleted.");
-    res.status(200).json(er);
+    const Retour = new Ret(0, req.body);
+    res.status(200).json(Retour);
+    return;
   } catch (err) {
-    let er = {
-      status: 1,
-      detail: err,
-    };
-    res.status(500).json(er);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
+    res.status(500).json(Retour);
+    return;
   }
 };
 
@@ -328,41 +303,38 @@ exports.Login = async (req, res) => {
       .get()
       .then((snapshot) => {
         if (snapshot.empty) {
-          //console.log("email non trouvé");
-          Retour.status = 1;
-          Retour.detail = "Error email/password not found";
+          const Retour = new Ret(1, "Error email/password not found");
           console.log(Retour);
-          res.status(200).json(Retour);
+          res.status(200).send(Retour);
           return;
         } else {
           snapshot.forEach((doc) => {
             if (doc.data().valid === true) {
-              Retour.status = 0;
               let obj = {
                 userid: doc.id,
                 nickname: doc.data().nickname,
                 email: doc.data().email,
               };
-              Retour.detail = jwt.sign(obj, jwtpwd.secret, {
-                algorithm: "HS256",
-                expiresIn: ExpToken,
-              });
+              const Retour = new Ret(
+                0,
+                jwt.sign(obj, jwtpwd.secret, {
+                  algorithm: "HS256",
+                  expiresIn: ExpToken,
+                })
+              );
               res.status(200).json(Retour);
               return;
             } else {
-              Retour.status = 1;
-              Retour.detail = "email not validated";
+              const Retour = new Ret(1, "email not validated");
               res.status(200).json(Retour);
               return;
             }
-            //console.log(Retour);
           });
         }
       });
     //console.log("fin :" + Ret);
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
+    const Retour = new Ret(1, err.message);
     console.log(Retour);
     res.status(500).json(Retour);
     return;
@@ -386,19 +358,17 @@ exports.ChgPwd = async (req, res) => {
       let db = await cnx.CnxDB();
       let updDoc = await db.collection("users").doc(decoded.userid);
       let upd = await updDoc.update(Npwd);
-      Retour.status = 0;
-      Retour.detail = "Password updated.";
+      const Retour = new Ret(0, "Password updated.");
       res.status(200).json(Retour);
       return;
     } else {
-      Retour.status = 1;
-      Retour.detail = "Invalid password";
+      const Retour = new Ret(1, "Invalid password");
       res.status(200).json(Retour);
       return;
     }
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
     res.status(500).json(Retour);
   }
 };
@@ -413,29 +383,26 @@ exports.Profil = async (req, res) => {
       .get()
       .then((doc) => {
         if (!doc.exists) {
-          Retour.status = 1;
-          Retour.detail = "No such document!";
+          const Retour = new Ret(1, "No such document!");
+          console.log("Retour:", Retour);
           res.status(500).json(Retour);
           return;
         } else {
           //console.log('Document data:', doc.data());
-          Retour.status = 0;
-          Retour.detail = doc.data();
+          const Retour = new Ret(0, doc.data());
           res.status(200).json(Retour);
           return;
         }
       })
       .catch((err) => {
-        Retour.status = 1;
-        Retour.detail = err;
-        console.log(Retour);
+        const Retour = new Ret(1, err.message);
+        console.log("Retour:", Retour);
         res.status(500).json(Retour);
         return;
       });
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
-    console.log(Retour);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
     res.status(500).json(Retour);
     return;
   }
@@ -447,23 +414,24 @@ exports.ReNew = async (req, res) => {
     console.log(token);
     const PayLoad = DecToken(token);
 
-    Retour.status = 0;
     let obj = {
       userid: PayLoad.userid,
       nickname: PayLoad.nickname,
       email: PayLoad.email,
     };
-    Retour.detail = jwt.sign(obj, jwtpwd.secret, {
-      algorithm: "HS256",
-      expiresIn: ExpToken,
-    });
+    const Retour = new Ret(
+      0,
+      jwt.sign(obj, jwtpwd.secret, {
+        algorithm: "HS256",
+        expiresIn: ExpToken,
+      })
+    );
 
     res.status(200).json(Retour);
     return;
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
-    console.log(Retour);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
     res.status(500).json(Retour);
     return;
   }
@@ -477,14 +445,12 @@ exports.makeToken = async (req, res) => {
       email: "tmp@tmp.com",
     };
     const tokTmp = await makeTokenTmp(obj);
-    Retour.status = 0;
-    Retour.detail = tokTmp;
+    const Retour = new Ret(0, tokTmp);
     res.status(200).json(Retour);
     return;
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
-    console.log(Retour);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
     res.status(500).json(Retour);
     return;
   }
@@ -502,15 +468,12 @@ exports.validMail = async (req, res) => {
     let updDoc = await db.collection("users").doc(userid);
     let upd = updDoc.update({ valid: true });
 
-    Retour.status = 0;
-    Retour.detail = "Account confirmed";
-
+    const Retour = new Ret(0, "Account confirmed");
     res.status(200).json(Retour);
     return;
   } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
-    console.log(Retour);
+    const Retour = new Ret(1, err.message);
+    console.log("Retour:", Retour);
     res.status(500).json(Retour);
     return;
   }
@@ -519,7 +482,7 @@ exports.validMail = async (req, res) => {
 exports.ResendToken = async (req, res) => {
   try {
     const user = await ReturnAccountByEmail(req.params.email);
-    const Retour = new Ret(0, "Token account resend");
+    let Retour = new Ret(0, "Token account resend");
 
     //console.log("user:", user);
 
