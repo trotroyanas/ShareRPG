@@ -9,6 +9,7 @@
   let NotifyMessage = "";
   let col = "";
   let displayLogin = false;
+  let displayResend = false;
 
   async function validAccount() {
     console.log("params:", $params.token);
@@ -29,9 +30,10 @@
       })
       .catch(err => {
         console.log(err.message);
-        NotifyMessage = err.message;
+        NotifyMessage = "Token Expired";
         col = "cnok";
         displayLogin = false;
+        displayResend = true;
         toastr["error"](err.message, "Error");
       });
   }
@@ -78,5 +80,11 @@
   <div class="t2">
     Go to
     <a href="/login">login</a>
+  </div>
+{/if}
+{#if displayResend}
+  <div class="t2">
+    Go to
+    <a href="/passwordresend">Resend new Token</a>
   </div>
 {/if}

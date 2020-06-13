@@ -15,6 +15,13 @@ const template = require("../templates/emails.json");
 
 const ExpToken = 3600 * 24;
 
+class Ret {
+  constructor(status, detail) {
+    this.status = status;
+    this.detail = detail;
+  }
+}
+
 //Encodage SH256
 function EncPwd(pw) {
   const hash = crypto.SHA256(pw);
@@ -30,6 +37,75 @@ function makeTokenTmp(obj) {
   return tok;
 }
 
+function ReturnAccountByEmail(email) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      //Cnx BDD
+      let db = await cnx.CnxDB();
+      let docRef = await db.collection("users");
+
+      await docRef
+        .where("email", "==", email)
+        .limit(1)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.empty) {
+            reject();
+          } else {
+            snapshot.forEach((doc) => {
+              let tt = doc.data();
+              let vv = {
+                ...tt,
+                userid: doc.id,
+              };
+              resolve(vv);
+            });
+          }
+        });
+    } catch (error) {
+      console.log(error.message);
+      reject();
+    }
+  });
+}
+
+async function PassCtrl(userid) {
+  try {
+    let db = await cnx.CnxDB();
+    let docRef = await db.collection("users").doc(userid);
+
+    let getDoc = await docRef
+      .get()
+      .then((doc) => {
+        if (!doc.exists) {
+          Retour.status = 1;
+          Retour.detail = "No such document!";
+        } else {
+          Retour.status = 0;
+          Retour.detail = { password: doc.data().password };
+        }
+      })
+      .catch((err) => {
+        Retour.status = 1;
+        Retour.detail = err;
+        console.log(Retour);
+      });
+    return Retour;
+  } catch (err) {
+    Retour.status = 1;
+    Retour.detail = err;
+    console.log(Retour);
+    return Retour;
+  }
+}
+
+function DecToken(token) {
+  const tok = token.split(".");
+  var jsonPayload = base64.decode(tok[1]);
+  //console.log(decodedData);
+  return JSON.parse(jsonPayload);
+}
+
 // Check email //
 exports.EmailExist = async (req, res) => {
   let email = req.params.email;
@@ -39,9 +115,6 @@ exports.EmailExist = async (req, res) => {
   } catch (e) {
     console.log(e.messsage);
   }
-
-  //console.log(email);
-  //console.log(userid);
 
   try {
     //Cnx BDD
@@ -84,43 +157,6 @@ exports.EmailExist = async (req, res) => {
     return;
   }
 };
-
-async function PassCtrl(userid) {
-  try {
-    let db = await cnx.CnxDB();
-    let docRef = await db.collection("users").doc(userid);
-
-    let getDoc = await docRef
-      .get()
-      .then((doc) => {
-        if (!doc.exists) {
-          Retour.status = 1;
-          Retour.detail = "No such document!";
-        } else {
-          Retour.status = 0;
-          Retour.detail = { password: doc.data().password };
-        }
-      })
-      .catch((err) => {
-        Retour.status = 1;
-        Retour.detail = err;
-        console.log(Retour);
-      });
-    return Retour;
-  } catch (err) {
-    Retour.status = 1;
-    Retour.detail = err;
-    console.log(Retour);
-    return Retour;
-  }
-}
-
-function DecToken(token) {
-  const tok = token.split(".");
-  var jsonPayload = base64.decode(tok[1]);
-  //console.log(decodedData);
-  return JSON.parse(jsonPayload);
-}
 
 exports.Get = async (req, res) => {
   try {
@@ -474,6 +510,62 @@ exports.validMail = async (req, res) => {
   } catch (err) {
     Retour.status = 1;
     Retour.detail = err;
+    console.log(Retour);
+    res.status(500).json(Retour);
+    return;
+  }
+};
+
+exports.ResendToken = async (req, res) => {
+  try {
+    const user = await ReturnAccountByEmail(req.params.email);
+    const Retour = new Ret(0, "Token account resend");
+
+    //console.log("user:", user);
+
+    if (!user) {
+      Retour.status = 1;
+      Retour.detail = "Email not exist";
+      console.log(Retour);
+      res.status(401).json(Retour);
+      return;
+    }
+
+    if (user.valid === true) {
+      Retour.status = 1;
+      Retour.detail = "Account already valid";
+      console.log(Retour);
+      res.status(401).send(Retour);
+      return;
+    }
+
+    //make Tmp token
+    let obj = {
+      userid: user.userid,
+      email: user.email,
+      nickname: user.nickname,
+    };
+    //make new token
+    let tokenTmp = makeTokenTmp(obj);
+    //make template
+    let nacc = template.new_account.replace("%nickname%", user.nickname).replace("%tokenTmp%", tokenTmp).replace("%tokenTmp%", tokenTmp);
+    aws
+      .SendEmailAws("contact@deco-recup.fr", user.email, "ShareRPG : resend valid account", nacc)
+      .then((e) => {
+        console.log("email Send");
+        console.log("MessageId:", e.MessageId);
+        res.status(200).send(Retour);
+        return;
+      })
+      .catch((err) => {
+        Retour.status = 1;
+        Retour.detail = err.message;
+        console.log(Retour);
+        res.status(500).send(Retour);
+        return;
+      });
+  } catch (err) {
+    const Retour = new Ret(1, err.message);
     console.log(Retour);
     res.status(500).json(Retour);
     return;
