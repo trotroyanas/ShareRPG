@@ -17,7 +17,7 @@
         .then(r => {
           try {
             if (r.data.status === 0) {
-              //console.log(r.data.detail);
+              console.log(r.data.detail);
               cook.saveCookie(r.data.detail);
             }
           } catch (error) {
@@ -29,6 +29,8 @@
         });
     }
   }
+
+  RenewToken();
 </script>
 
 <slot />
