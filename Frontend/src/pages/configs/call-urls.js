@@ -9,6 +9,8 @@ const Urls = {
   renew: "http://localhost:3000/api/account/renew",
   emailexist: "http://localhost:3000/api/account/emailexist",
   maketoken: "http://localhost:3000/api/account/maketoken",
+  validmail: "http://localhost:3000/api/account/validmail",
+  resendtoken: "http://localhost:3000/api/account/resendtoken",
 };
 
 export default Urls;

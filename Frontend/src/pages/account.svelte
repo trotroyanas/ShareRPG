@@ -46,7 +46,7 @@
         }
       })
       .then(async ret => {
-        console.log(ret.data);
+        //console.log(ret.data);
         if (ret.data.status === 0) {
           await axios
             .post(

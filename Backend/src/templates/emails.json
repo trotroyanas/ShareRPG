@@ -1,0 +1,4 @@
+{
+  "new_account": "Bonjour %nickname%, merci d'avoir créé votre compte sur ShareRPG.com, merci de confirmer ce compte en cliquant sur le lien suivant : <a href='http://localhost:5000/validemail/%tokenTmp%'>http://localhost:5000/validemail/%tokenTmp%</a>",
+  "chg_account": "Bonjour %nickname%, vous avez changer l'adresse email de votre compte sur ShareRPG.com, merci de confirmer ce compte en cliquant sur le lien suivant : %tokenTmp%"
+}

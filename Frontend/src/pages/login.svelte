@@ -106,9 +106,6 @@
         </span>
       </div>
       <div class="form-separator sep-top sep-bot mg-top25 mg-bot25">OR</div>
-      <div class="pt mg-bot25 sep-bot pdb25 text-center">
-        <a href="/account">Create account</a>
-      </div>
       <div class="form-group">
         <button type="button" class="btn btn-primary facebook">
           <i class="fab fa-facebook facebook" />
@@ -116,12 +113,20 @@
         </button>
       </div>
       <div class="form-group mt30">
-
         <button type="button" class="btn btn-primary google">
           <i class="fab fa-google" />
           &nbsp;google
         </button>
       </div>
+
+      <div class="form-separator sep-top sep-bot mg-top25 mg-bot25">
+        <a href="/account">Create account</a>
+      </div>
+
+      <div class="tc sep-bot pdb25 mg-bot25">
+        <a href="/passwordresend">Password / Resend</a>
+      </div>
+
     </div>
   </div>
 </div>
