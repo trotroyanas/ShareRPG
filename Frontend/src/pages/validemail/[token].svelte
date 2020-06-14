@@ -12,7 +12,7 @@
   let displayResend = false;
 
   async function validAccount() {
-    console.log("params:", $params.token);
+    //console.log("params:", $params.token);
 
     const valid = await axios
       .get(Urls.validmail, {

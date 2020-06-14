@@ -21,7 +21,10 @@ router.post("/login", accountController.Login);
 router.get("/maketoken", accountController.makeToken);
 router.get("/validmail", verify.auth, accountController.validMail);
 
+// pour les pertes de password ou de token plus valide pour valider son compte/email
 router.get("/resendtoken/:email", verify.auth, accountController.ResendToken);
+router.get("/resetpassword/:email", verify.auth, accountController.ResetPassword);
+router.post("/newpassword", verify.auth, accountController.NewPassword);
 
 /** end Account */
 
