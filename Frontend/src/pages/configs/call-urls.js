@@ -11,6 +11,8 @@ const Urls = {
   maketoken: "http://localhost:3000/api/account/maketoken",
   validmail: "http://localhost:3000/api/account/validmail",
   resendtoken: "http://localhost:3000/api/account/resendtoken",
+  resetpassword: "http://localhost:3000/api/account/resetpassword",
+  newpassword: "http://localhost:3000/api/account/newpassword",
 };
 
 export default Urls;

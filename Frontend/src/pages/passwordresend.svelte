@@ -18,7 +18,29 @@
   let emailPassword = "trotroyanas@gmail.com";
   let emailToken = "trotroyanas@gmail.com";
 
-  function SendNewPassword() {}
+  async function SendNewPassword() {
+    const tt = await axios.get(Urls.maketoken);
+    const tmpToken = tt.data.detail;
+    console.log("tmpToken:", tmpToken);
+
+    const valid = await axios
+      .get(Urls.resetpassword + "/" + emailPassword, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + tmpToken
+        }
+      })
+      .then(re => {
+        NotifyMessage = re.data.detail;
+        toastr["success"](NotifyMessage, "Success");
+        //$goto("/login");
+      })
+      .catch(er => {
+        console.log(er.message);
+        NotifyMessage = er.message;
+        toastr["error"](NotifyMessage, "error");
+      });
+  }
 
   async function SendNewToken() {
     const tt = await axios.get(Urls.maketoken);
@@ -98,7 +120,6 @@
           <button type="submit" class="btn btn-primary">New token</button>
         </div>
       </form>
-
     </div>
   </div>
 </div>

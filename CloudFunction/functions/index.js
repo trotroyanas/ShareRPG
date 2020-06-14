@@ -25,7 +25,7 @@ admin.initializeApp();
   });
  */
 exports.makeUppercaseUpdate = functions
-  .region("europe-west1")
+  .region("us-central1")
   .firestore.document("/users/{documentId}")
   .onWrite((change, context) => {
     //if new data no deleted

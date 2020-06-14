@@ -44,6 +44,7 @@ function ReturnAccountByEmail(email) {
         .get()
         .then((snapshot) => {
           if (snapshot.empty) {
+            console.log("big error 2");
             reject();
           } else {
             snapshot.forEach((doc) => {
@@ -52,12 +53,14 @@ function ReturnAccountByEmail(email) {
                 ...tt,
                 userid: doc.id,
               };
+
               resolve(vv);
             });
           }
         });
     } catch (error) {
-      console.log(error.message);
+      console.log("big error 3");
+      console.log(error);
       reject();
     }
   });
@@ -527,6 +530,75 @@ exports.ResendToken = async (req, res) => {
         res.status(500).send(Retour);
         return;
       });
+  } catch (err) {
+    const Retour = new Ret(1, err.message);
+    console.log(Retour);
+    res.status(500).json(Retour);
+    return;
+  }
+};
+
+exports.ResetPassword = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await ReturnAccountByEmail(email);
+    let Retour = new Ret(0, "Token account resend");
+
+    if (!user) {
+      Retour.status = 1;
+      Retour.detail = "Email not exist";
+      console.log(Retour);
+      res.status(401).json(Retour);
+      return;
+    }
+
+    //make Tmp token
+    let obj = {
+      userid: user.userid,
+      email: user.email,
+      nickname: user.nickname,
+    };
+    //make new token
+    let tokenTmp = makeTokenTmp(obj);
+    //make template
+    let nacc = template.reset_password.replace("%nickname%", user.nickname).replace("%tokenTmp%", tokenTmp).replace("%tokenTmp%", tokenTmp);
+    aws
+      .SendEmailAws("contact@deco-recup.fr", user.email, "ShareRPG : password reset", nacc)
+      .then((e) => {
+        console.log("email Send");
+        console.log("MessageId:", e.MessageId);
+        res.status(200).send(Retour);
+        return;
+      })
+      .catch((err) => {
+        Retour.status = 1;
+        Retour.detail = err.message;
+        console.log(Retour);
+        res.status(500).send(Retour);
+        return;
+      });
+  } catch (err) {
+    const Retour = new Ret(1, err);
+    console.log(Retour);
+    res.status(500).json(Retour);
+    return;
+  }
+};
+
+exports.NewPassword = async (req, res) => {
+  try {
+    const pwd = req.body.password;
+    const npwd = EncPwd(pwd);
+    let token = req.headers.authorization.substring(7);
+    var decoded = await jwt.verify(token, jwtpwd.secret);
+    const userid = decoded.userid;
+
+    let db = cnx.CnxDB();
+    let updDoc = await db.collection("users").doc(userid);
+    let upd = updDoc.update({ password: npwd });
+    const Retour = new Ret(0, "Password changed");
+    res.status(200).send(Retour);
+    return;
   } catch (err) {
     const Retour = new Ret(1, err.message);
     console.log(Retour);
