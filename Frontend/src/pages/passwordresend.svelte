@@ -99,7 +99,7 @@
 
       <div class="form-separator sep-top sep-bot mg-top25 mg-bot25">OR</div>
 
-      <div class="form-account-title pdt25">Resend account token</div>
+      <div class="form-account-title pdt25">Resend email validation</div>
       <form
         on:submit|preventDefault={SendNewToken}
         class="form-grid"
@@ -117,7 +117,7 @@
             required />
         </div>
         <div class="">
-          <button type="submit" class="btn btn-primary">New token</button>
+          <button type="submit" class="btn btn-primary">Resend</button>
         </div>
       </form>
     </div>
