@@ -3,6 +3,7 @@
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "../configs/call-urls.js";
+  import Joi from "@hapi/joi";
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
@@ -21,22 +22,39 @@
   let NotifyMessage = "";
   let NotifyClass = "";
 
-  let password = "colosus";
-  let cupwd = "colosus";
-  let copwd = "colosus";
+  let user = {
+    current_password: "U425ve!!K^A^U!X2jx",
+    password: "U425ve!!K^A^U!X2jx",
+    password_confirm: "U425ve!!K^A^U!X2jx"
+  };
+
+  //const pattern = /^[a-zA-Z0-9!@#$~^%&*]{3,25}$/;
+  const passwordPatern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+  const schema = Joi.object({
+    current_password: Joi.string().required(),
+    password: Joi.string()
+      .required()
+      .pattern(new RegExp(passwordPatern)),
+    password_confirm: Joi.ref("password")
+  });
 
   async function formSubmit(e) {
-    //console.log(password);
-    if (password !== copwd) {
-      toastr["error"]("Passwords not match.", "Error");
-      e.target.reset();
+    try {
+      const value = await schema.validateAsync(user);
+    } catch (err) {
+      console.log("err:", err.message);
+      NotifyMessage = err.message;
+      NotifyVisible = true;
+      NotifyClass = "notify-error";
+      toastr["error"](NotifyMessage, "Error");
       return;
     }
+
     let sess = await Cooks.readConnected();
 
     let axiosData = {
-      current_password: cupwd,
-      password: password
+      current_password: user.current_password,
+      password: user.password
     };
 
     axios
@@ -47,7 +65,9 @@
         }
       })
       .then(r => {
+        console.log(r.data);
         if (r.data.status === 0) {
+          console.log("p001");
           let msg = r.data.detail;
           toastr["success"](msg, "Success");
           NotifyVisible = true;
@@ -64,8 +84,8 @@
       })
       .catch(e => {
         console.log("Catch Error");
-        console.log(e);
-        toastr["error"](e, "Error");
+        console.log(e.message);
+        toastr["error"](e.message, "Error");
         Cooks.delCookie();
         $goto("/login");
       });
@@ -94,7 +114,7 @@
             id="cupwd"
             name="password"
             class="form-control"
-            bind:value={cupwd}
+            bind:value={user.current_password}
             required />
         </div>
         <div class="form-group">
@@ -104,7 +124,7 @@
             id="password"
             name="password"
             class="form-control"
-            bind:value={password}
+            bind:value={user.password}
             required />
         </div>
         <div class="form-group">
@@ -114,7 +134,7 @@
             id="copwd"
             name="passwordConf"
             class="form-control"
-            bind:value={copwd}
+            bind:value={user.password_confirm}
             required />
         </div>
         <button type="submit" class="btn btn-primary">Change</button>

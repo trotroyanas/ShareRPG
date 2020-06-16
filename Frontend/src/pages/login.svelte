@@ -4,6 +4,7 @@
   import toastr from "toastr";
   import axios from "axios";
   import Urls from "./configs/call-urls.js";
+  import Joi from "@hapi/joi";
   import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
 
@@ -15,17 +16,33 @@
 
   let isConnect = false;
 
-  let email = "trotroyanas@gmail.com";
-  let password = "colosus";
+  let user = {
+    email: "trotroyanas@gmail.com",
+    password: "colosus"
+  };
+
+  const schema = Joi.object({
+    email: Joi.string()
+      .min(3)
+      .pattern(new RegExp(/^[\w-\.+]+@([\w-]+\.)+[\w-]{2,4}$/))
+      .required(),
+    password: Joi.string().required()
+  });
 
   async function formSubmit(e) {
-    //console.log(email);
-    //console.log(password);
+    try {
+      const value = await schema.validateAsync(user);
+    } catch (err) {
+      console.log("err:", err.message);
+      NotifyMessage = "Bad email.";
+      toastr["error"](NotifyMessage, "Error");
+      return;
+    }
 
     await axios
       .post(Urls.login, {
-        email: email,
-        password: password
+        email: user.email,
+        password: user.password
       })
       .then(r => {
         //console.log(r.data);
@@ -83,7 +100,7 @@
             id="email"
             name="email"
             class="form-control"
-            bind:value={email}
+            bind:value={user.email}
             required />
         </div>
         <div class="form-group">
@@ -93,7 +110,7 @@
             id="password"
             name="password"
             class="form-control"
-            bind:value={password}
+            bind:value={user.password}
             required />
         </div>
         <button type="submit" class="btn btn-primary">Login</button>

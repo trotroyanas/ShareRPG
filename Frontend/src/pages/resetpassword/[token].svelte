@@ -5,6 +5,7 @@
   import { params } from "@sveltech/routify";
   import toastr from "toastr";
   import axios from "axios";
+  import Joi from "@hapi/joi";
   import { goto } from "@sveltech/routify";
 
   let NotifyMessage = "";
@@ -12,14 +13,26 @@
   let displayLogin = false;
   let displayResend = false;
 
-  let pwd = "colosus";
-  let cpwd = "colosus";
+  let user = {
+    password: "U425ve!!K^A^U!X2jx",
+    password_confirm: "U425ve!!K^A^U!X2jx"
+  };
+
+  //const pattern = /^[a-zA-Z0-9!@#$~^%&*]{3,25}$/;
+  const passwordPatern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+  const schema = Joi.object({
+    password: Joi.string()
+      .required()
+      .pattern(new RegExp(passwordPatern)),
+    passwordConfirm: Joi.ref("password")
+  });
 
   async function formSubmit() {
-    //console.log("params:", $params.token);
-
-    if (pwd !== cpwd) {
-      NotifyMessage = "Passwords not the same";
+    try {
+      const value = await schema.validateAsync(user);
+    } catch (err) {
+      console.log("err:", err.message);
+      NotifyMessage = "err.message";
       toastr["error"](NotifyMessage, "Error");
       return;
     }
@@ -28,7 +41,7 @@
       .post(
         Urls.newpassword,
         {
-          password: pwd
+          password: user.password
         },
         {
           headers: {
@@ -75,7 +88,7 @@
             id="email"
             name="email"
             class="form-control"
-            bind:value={pwd}
+            bind:value={user.password}
             required />
         </div>
         <div class="form-group">
@@ -85,7 +98,7 @@
             id="password"
             name="password"
             class="form-control"
-            bind:value={cpwd}
+            bind:value={user.password_confirm}
             required />
         </div>
         <button type="submit" class="btn btn-primary">Confirm</button>

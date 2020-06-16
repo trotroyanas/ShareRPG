@@ -26,7 +26,6 @@
   };
   //const pattern = /^[a-zA-Z0-9!@#$~^%&*]{3,25}$/;
   const passwordPatern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-
   const schema = Joi.object({
     email: Joi.string()
       .min(3)
