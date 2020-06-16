@@ -5,6 +5,7 @@
   import Urls from "./configs/call-urls.js";
   import { goto } from "@sveltech/routify";
   import Cooks from "./configs/SessionCookie.js";
+  import Joi from "@hapi/joi";
 
   import toastrOptions from "./configs/toastroptions.js";
   toastr.options = toastrOptions;
@@ -20,17 +21,45 @@
     nickname: "trotro",
     lastname: "Perps",
     name: "Perpi",
-    password: "colosus",
-    passwordConfirm: "colosus"
+    password: "U425ve!!K^A^U!X2jx",
+    passwordConfirm: "U425ve!!K^A^U!X2jx"
   };
+  //const pattern = /^[a-zA-Z0-9!@#$~^%&*]{3,25}$/;
+  const passwordPatern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+  const schema = Joi.object({
+    email: Joi.string()
+      .min(3)
+      .pattern(new RegExp(/^[\w-\.+]+@([\w-]+\.)+[\w-]{2,4}$/))
+      .required(),
+    nickname: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
+    name: Joi.string()
+      .min(3)
+      .max(50)
+      .required(),
+    lastname: Joi.string()
+      .min(3)
+      .max(50)
+      .required(),
+    password: Joi.string()
+      .required()
+      .pattern(new RegExp(passwordPatern)),
+    passwordConfirm: Joi.ref("password")
+  });
 
   async function formSubmit(e) {
-    // donne les options à toastr
-    if (user.password !== user.passwordConfirm) {
-      toastr["error"]("Passwords not match", "Error");
-      NotifyErrorMessage = "Passwords not match";
+    try {
+      const value = await schema.validateAsync(user);
+      console.log("value:", value);
+    } catch (err) {
+      console.log("err:", err.message);
+      NotifyErrorMessage = err.message;
       NotifySuccessVisible = false;
       NotifyErrorVisible = true;
+      toastr["error"](NotifyErrorMessage, "Error");
       return;
     }
 

@@ -4,6 +4,7 @@
   import axios from "axios";
   import Urls from "../configs/call-urls.js";
   import Cooks from "../configs/SessionCookie.js";
+  import Joi from "@hapi/joi";
   import toastrOptions from "../configs/toastroptions.js";
   toastr.options = toastrOptions;
 
@@ -33,6 +34,27 @@
     name: "",
     valid: true
   };
+
+  const schema = Joi.object({
+    email: Joi.string()
+      .min(3)
+      .pattern(new RegExp(/^[\w-\.+]+@([\w-]+\.)+[\w-]{2,4}$/))
+      .required(),
+    nickname: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
+    name: Joi.string()
+      .min(3)
+      .max(50)
+      .required(),
+    lastname: Joi.string()
+      .min(3)
+      .max(50)
+      .required(),
+    valid: Joi.boolean()
+  });
 
   async function load() {
     //console.log(userid);
@@ -77,6 +99,17 @@
     //console.log(user.email);
     //console.log(userid);
     //console.log(Urls.emailexist);
+
+    try {
+      const value = await schema.validateAsync(user);
+    } catch (err) {
+      console.log("err:", err.message);
+      NotifyErrorMessage = err.message;
+      NotifySuccessVisible = false;
+      NotifyErrorVisible = true;
+      toastr["error"](NotifyErrorMessage, "Error");
+      return;
+    }
 
     const valid = await axios
       .get(Urls.emailexist + "/" + user.email + "/" + userid, {

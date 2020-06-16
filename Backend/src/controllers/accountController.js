@@ -66,33 +66,35 @@ function ReturnAccountByEmail(email) {
   });
 }
 
-async function PassCtrl(userid) {
-  try {
-    let db = await cnx.CnxDB();
-    let docRef = await db.collection("users").doc(userid);
+function PassCtrl(userid) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let db = await cnx.CnxDB();
+      let docRef = await db.collection("users").doc(userid);
 
-    let getDoc = await docRef
-      .get()
-      .then((doc) => {
-        if (!doc.exists) {
-          const Retour = new Ret(1, "No such document!");
-          return Retour;
-        } else {
-          const Retour = new Ret(0, { password: doc.data().password });
-          return Retour;
-        }
-      })
-      .catch((err) => {
-        const Retour = new Ret(1, err.message);
-        console.log(Retour);
-        return Retour;
-      });
-    s;
-  } catch (err) {
-    const Retour = new Ret(1, err.message);
-    console.log(Retour);
-    return Retour;
-  }
+      let getDoc = await docRef
+        .get()
+        .then((doc) => {
+          if (!doc.exists) {
+            const Retour = new Ret(1, "No such document!");
+            resolve(Retour);
+          } else {
+            const Retour = new Ret(0, { password: doc.data().password });
+            resolve(Retour);
+          }
+        })
+        .catch((err) => {
+          const Retour = new Ret(1, err.message);
+          console.log(Retour);
+          reject(Retour);
+        });
+      s;
+    } catch (err) {
+      const Retour = new Ret(1, err.message);
+      console.log("error:" + Retour);
+      reject(Retour);
+    }
+  });
 }
 
 function DecToken(token) {
@@ -351,7 +353,9 @@ exports.ChgPwd = async (req, res) => {
     const userid = decoded.userid;
 
     let user = await PassCtrl(userid);
+
     const cupwd = EncPwd(req.body.current_password); // current password pour Verif vs User.detail.password
+
     const Npwd = {
       password: EncPwd(req.body.password), // nouveau password encodé
     };
@@ -365,7 +369,7 @@ exports.ChgPwd = async (req, res) => {
       res.status(200).json(Retour);
       return;
     } else {
-      const Retour = new Ret(1, "Invalid password");
+      const Retour = new Ret(1, "Invalid current password");
       res.status(200).json(Retour);
       return;
     }
@@ -496,15 +500,13 @@ exports.ResendToken = async (req, res) => {
       res.status(401).json(Retour);
       return;
     }
-
     if (user.valid === true) {
       Retour.status = 1;
       Retour.detail = "Account already valid";
       console.log(Retour);
-      res.status(401).send(Retour);
+      res.status(200).send(Retour);
       return;
     }
-
     //make Tmp token
     let obj = {
       userid: user.userid,
@@ -542,7 +544,7 @@ exports.ResetPassword = async (req, res) => {
   try {
     const email = req.params.email;
     const user = await ReturnAccountByEmail(email);
-    let Retour = new Ret(0, "Token account resend");
+    let Retour = new Ret(0, "Email send");
 
     if (!user) {
       Retour.status = 1;
