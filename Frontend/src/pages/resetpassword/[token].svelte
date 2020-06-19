@@ -24,7 +24,7 @@
     password: Joi.string()
       .required()
       .pattern(new RegExp(passwordPatern)),
-    passwordConfirm: Joi.ref("password")
+    password_confirm: Joi.ref("password")
   });
 
   async function formSubmit() {
@@ -32,7 +32,7 @@
       const value = await schema.validateAsync(user);
     } catch (err) {
       console.log("err:", err.message);
-      NotifyMessage = "err.message";
+      NotifyMessage = err.message;
       toastr["error"](NotifyMessage, "Error");
       return;
     }

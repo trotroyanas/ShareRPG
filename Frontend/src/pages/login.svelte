@@ -18,7 +18,7 @@
 
   let user = {
     email: "trotroyanas@gmail.com",
-    password: "colosus"
+    password: "U425ve!!K^A^U!X2jx"
   };
 
   const schema = Joi.object({

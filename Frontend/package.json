@@ -28,6 +28,7 @@
     "ppid-changed": "^1.0.1",
     "rollup": "^2.6.1",
     "rollup-plugin-copy": "^3.3.0",
+    "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-livereload": "^1.2.0",
     "rollup-plugin-svelte": "^5.2.1",
     "rollup-plugin-terser": "^5.3.0",
@@ -41,10 +42,14 @@
     "axios": "^0.19.2",
     "base-64": "^0.1.0",
     "buffer": "^5.6.0",
+    "firebase": "^7.15.2",
+    "firebase-admin": "^8.12.1",
     "jsonwebtoken": "^8.5.1",
     "npm": "^6.14.5",
     "rollup-plugin-babel": "^4.4.0",
+    "sass": "^1.26.8",
     "svelte": "^3.20.1",
-    "toastr": "^2.1.4"
+    "toastr": "^2.1.4",
+    "uuidv4": "^6.1.0"
   }
 }
