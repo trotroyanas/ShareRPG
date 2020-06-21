@@ -3,7 +3,7 @@
 .DS_Store
 **/.history
 
-
+storage_gcp.js
 frontend_gcp.json
 jwt.json
 cle_api.json
