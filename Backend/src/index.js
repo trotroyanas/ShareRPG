@@ -27,6 +27,9 @@ app.get("/", (req, res) => {
 const account = require("../src/routes/account.js");
 app.use("/api/account", account);
 
+const docman = require("../src/routes/docman.js");
+app.use("/api/docman", docman);
+
 /* const mycache = require("../src/controllers/cache.js");
 mycache.FillCache();
  */

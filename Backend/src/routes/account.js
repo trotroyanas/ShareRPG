@@ -14,17 +14,14 @@ router.post("/chgpwd", verify.auth, accountController.ChgPwd);
 router.get("/emailexist/:email/:userid?", verify.auth, accountController.EmailExist);
 router.get("/profil/:userid", verify.auth, accountController.Profil);
 router.get("/renew", verify.auth, accountController.ReNew);
-
 router.delete("/del/:userid", accountController.Del);
-
-router.post("/login", accountController.Login);
-router.get("/maketoken", accountController.makeToken);
 router.get("/validmail", verify.auth, accountController.validMail);
-
-// pour les pertes de password ou de token plus valide pour valider son compte/email
 router.get("/resendtoken/:email", verify.auth, accountController.ResendToken);
 router.get("/resetpassword/:email", verify.auth, accountController.ResetPassword);
 router.post("/newpassword", verify.auth, accountController.NewPassword);
+
+router.post("/login", accountController.Login);
+router.get("/maketoken", accountController.makeToken);
 
 /** end Account */
 

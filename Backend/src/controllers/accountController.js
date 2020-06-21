@@ -14,6 +14,8 @@ const base64 = require("base-64");
 const aws = require("./sendEmail.js");
 const template = require("../templates/emails.json");
 
+const global = require("./global.js");
+
 const ExpToken = 3600 * 24;
 
 //Encodage SH256
@@ -95,13 +97,6 @@ function PassCtrl(userid) {
       reject(Retour);
     }
   });
-}
-
-function DecToken(token) {
-  const tok = token.split(".");
-  var jsonPayload = base64.decode(tok[1]);
-  //console.log(decodedData);
-  return JSON.parse(jsonPayload);
 }
 
 // Check email //
@@ -419,7 +414,7 @@ exports.ReNew = async (req, res) => {
   try {
     let token = req.headers.authorization.substring(7);
     console.log(token);
-    const PayLoad = DecToken(token);
+    const PayLoad = global.DecToken(token);
 
     let obj = {
       userid: PayLoad.userid,
