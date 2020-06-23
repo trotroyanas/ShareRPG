@@ -27,14 +27,17 @@
 
   let files = [];
   let lstImgs = [];
-  let lstImgs2 = [];
+  //let lstImgs2 = [];
   let proms = [];
 
   function listFiles(e) {
     var preview = document.querySelector("#pulp");
 
-    if (e.target.files) {
+    if (e.target.files.length > 0) {
       [].forEach.call(e.target.files, readAndPreview);
+    } else {
+      $: lstImgs = [];
+      return;
     }
 
     function readAndPreview(file) {
@@ -44,21 +47,25 @@
           reader.addEventListener("load", function() {
             // Make sure `file.name` matches our extensions criteria
             let imgUrl;
-
+            let typ;
             switch (file.name.split(".").pop()) {
               case "jpg":
               case "jpeg":
               case "png":
               case "gif":
                 imgUrl = this.result;
+                typ = file.type;
                 break;
               case "pdf":
                 imgUrl =
                   "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fnew_pdf.jpg?alt=media&token=b6116a13-eafb-48db-b0e3-246e169a92bb";
+                typ = "document/pdf";
+
                 break;
               case "zip":
                 imgUrl =
                   "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fzip.jpg?alt=media&token=2e65e80c-941a-4931-b147-896e7dc54172";
+                typ = "document/zip";
                 break;
               default:
                 alert(file.name + " is not good for manager document");
@@ -66,19 +73,15 @@
                 return;
             }
 
-            /*             if (!/\.(jpe?g|png|gif)$/i.test(file.name)) {
-              imgUrl =
-                "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fnew_pdf.jpg?alt=media&token=b6116a13-eafb-48db-b0e3-246e169a92bb";
-            } else {
-              imgUrl = this.result;
-            } */
-
             lstImgs.push({
-              file: this.result,
+              //file: this.result,
               thumb: imgUrl,
-              type: file.type,
-              size: file.size,
-              name: file.name
+              type: typ,
+              size: (file.size / 1024 / 1024).toFixed(2).toString() + " Mo",
+              nameori: file.name,
+              ext: file.name.split(".").pop(),
+              userid: userid,
+              name: uuid() + "." + file.name.split(".").pop()
             });
             resolve();
           });
@@ -89,7 +92,7 @@
 
     Promise.all(proms)
       .then(() => {
-        $: lstImgs2 = lstImgs;
+        $: lstImgs = lstImgs;
         console.log("finish...");
       })
       .catch(e => {
@@ -98,20 +101,36 @@
   }
 
   function UploadLst() {
+    const fics = document.getElementById("file").files;
     var storageRef = firebase.storage().ref();
-    lstImgs.forEach(el => {
-      const newid = uuid();
-      let ext = el.name.split(".").pop();
-      const task = storageRef.child(userid + "/" + newid + "." + ext).put(el);
-      task.then(sn => {
-        console.log("sn:", sn);
+    fics.forEach(el => {
+      lstImgs.forEach((ff, i) => {
+        if (el.name === ff.nameori) {
+          const task = storageRef
+            .child("documents/" + ff.userid + "/" + ff.name)
+            .put(el);
+          task.then(sn => {
+            removeByName(ff.nameori);
+          });
+        }
       });
     });
   }
 
+  function removeByName(kk) {
+    lstImgs.filter((zu, i) => {
+      if (zu.nameori === kk) {
+        //console.log("i:", i);
+        lstImgs.splice(i, 1);
+        $: lstImgs = lstImgs;
+      }
+    });
+  }
+
   function removeDoc(key) {
+    //console.log("lstImgs:", lstImgs.length);
     lstImgs.splice(key, 1);
-    $: lstImgs2 = lstImgs2;
+    $: lstImgs = lstImgs;
   }
 </script>
 
@@ -133,12 +152,16 @@
     margin: 5px;
   }
 
-  .divTxt {
+  .divFlex {
     display: flex;
+  }
+
+  .divTxt {
     font-size: 10px;
     font-style: italic;
     padding: 5px;
     color: #999;
+    border: 0px solid green;
   }
 
   .divBtn {
@@ -146,8 +169,12 @@
     text-align: center;
     font-size: 16px;
     font-style: normal;
+    bottom: 0px;
   }
 
+  .tc {
+    text-align: center;
+  }
   .tle {
     border: 0px solid red;
     width: 50%;
@@ -216,14 +243,18 @@
 
         <div id="pulp" class="pulp">
 
-          {#each lstImgs2 as item, i}
+          {#each lstImgs as item, i}
             <div class="divMaster">
-              <div>
+              <div class="tc">
                 <img src={item.thumb} class="thumb" alt="" />
               </div>
-              <div class="divTxt">
+              <div class="divTxt divFlex">
                 <div class="tle">{item.type}</div>
-                <div class="tlr">S:{item.size}</div>
+                <div class="tlr">{item.size}</div>
+              </div>
+              <div class="divTxt">
+                <div>name :</div>
+                <div>{item.nameori}</div>
               </div>
               <div class="divBtn">
                 <a
@@ -237,7 +268,7 @@
             </div>
           {/each}
         </div>
-        {#if lstImgs2.length > 0}
+        {#if lstImgs.length > 0}
           <div style="margin-top: 30px">
             <input
               class="label-file"
