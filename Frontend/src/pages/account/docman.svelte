@@ -40,15 +40,42 @@
     function readAndPreview(file) {
       proms.push(
         new Promise((resolve, reject) => {
-          // Make sure `file.name` matches our extensions criteria
-          if (!/\.(jpe?g|png|gif)$/i.test(file.name)) {
-            return alert(file.name + " is not an image");
-          } // else...
-
           var reader = new FileReader();
           reader.addEventListener("load", function() {
+            // Make sure `file.name` matches our extensions criteria
+            let imgUrl;
+
+            switch (file.name.split(".").pop()) {
+              case "jpg":
+              case "jpeg":
+              case "png":
+              case "gif":
+                imgUrl = this.result;
+                break;
+              case "pdf":
+                imgUrl =
+                  "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fnew_pdf.jpg?alt=media&token=b6116a13-eafb-48db-b0e3-246e169a92bb";
+                break;
+              case "zip":
+                imgUrl =
+                  "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fzip.jpg?alt=media&token=2e65e80c-941a-4931-b147-896e7dc54172";
+                break;
+              default:
+                alert(file.name + " is not good for manager document");
+                resolve();
+                return;
+            }
+
+            /*             if (!/\.(jpe?g|png|gif)$/i.test(file.name)) {
+              imgUrl =
+                "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fnew_pdf.jpg?alt=media&token=b6116a13-eafb-48db-b0e3-246e169a92bb";
+            } else {
+              imgUrl = this.result;
+            } */
+
             lstImgs.push({
-              img: this.result,
+              file: this.result,
+              thumb: imgUrl,
               type: file.type,
               size: file.size,
               name: file.name
@@ -65,7 +92,9 @@
         $: lstImgs2 = lstImgs;
         console.log("finish...");
       })
-      .catch(e => console.log(e.message));
+      .catch(e => {
+        console.log(e);
+      });
   }
 
   function UploadLst() {
@@ -174,6 +203,7 @@
           Documents Manager
         </h2>
       </div>
+
       <!-- Nous avons ici notre label et l'input afférent -->
       <div class="dd">
         <label for="file" class="label-file">Choisir une image</label>
@@ -189,7 +219,7 @@
           {#each lstImgs2 as item, i}
             <div class="divMaster">
               <div>
-                <img src={item.img} class="thumb" alt="" />
+                <img src={item.thumb} class="thumb" alt="" />
               </div>
               <div class="divTxt">
                 <div class="tle">{item.type}</div>
