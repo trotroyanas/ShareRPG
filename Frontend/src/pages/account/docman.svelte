@@ -144,7 +144,7 @@
   }
 
   .divMaster {
-    display: inline-flex;
+    position: relative;
     max-width: 152px;
     border: 1px solid red;
     /* border: 1px solid #bbb; */

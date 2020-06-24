@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.10.1",
+    "@firebase/app": "^0.6.6",
     "@hapi/joi": "^17.1.1",
     "@sveltech/routify": "^1.5.9",
     "@uppy/core": "^1.11.0",
@@ -46,7 +47,7 @@
     "axios": "^0.19.2",
     "base-64": "^0.1.0",
     "buffer": "^5.6.0",
-    "firebase": "^7.15.2",
+    "firebase": "^7.15.4",
     "firebase-admin": "^8.12.1",
     "jsonwebtoken": "^8.5.1",
     "npm": "^6.14.5",
