@@ -1,7 +1,13 @@
 .DS_Store
 node_modules
 /dist
+
+# Secret & config
 config
+configs
+config
+frontend_gcp.json
+storage_gcp.js
 
 
 # local env files
@@ -21,4 +27,3 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
-"frontend_gcp.json" 
