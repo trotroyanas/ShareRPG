@@ -58,9 +58,8 @@
                 break;
               case "pdf":
                 imgUrl =
-                  "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fnew_pdf.jpg?alt=media&token=b6116a13-eafb-48db-b0e3-246e169a92bb";
+                  "https://firebasestorage.googleapis.com/v0/b/sharerpg-772e6.appspot.com/o/images%2Fpdf.jpg?alt=media&token=74f14196-e867-4469-9f85-7e31531f8459";
                 typ = "document/pdf";
-
                 break;
               case "zip":
                 imgUrl =
@@ -145,11 +144,14 @@
   }
 
   .divMaster {
+    display: inline-flex;
     max-width: 152px;
-    border: 1px solid #bbb;
+    border: 1px solid red;
+    /* border: 1px solid #bbb; */
     padding-bottom: 5px;
     margin-bottom: 10px;
     margin: 5px;
+    max-height: 100%;
   }
 
   .divFlex {
@@ -165,11 +167,13 @@
   }
 
   .divBtn {
+    align-items: stretch;
     color: var(--blood-dark);
     text-align: center;
     font-size: 16px;
     font-style: normal;
     bottom: 0px;
+    border: 1px solid green;
   }
 
   .tc {
