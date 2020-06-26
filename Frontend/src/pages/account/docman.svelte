@@ -99,7 +99,7 @@
       });
   }
 
-  function UploadLst() {
+  function _UploadLst() {
     const fics = document.getElementById("file").files;
     var storageRef = firebase.storage().ref();
     fics.forEach(el => {
@@ -131,6 +131,11 @@
     lstImgs.splice(key, 1);
     $: lstImgs = lstImgs;
   }
+
+  function UploadLst() {
+    const doc = document.getElementById("doc_0");
+    doc.className = "loader";
+  }
 </script>
 
 <style lang="scss">
@@ -141,39 +146,6 @@
   .thumb {
     max-width: 150px;
     max-height: 150px;
-  }
-
-  .divMaster {
-    position: relative;
-    max-width: 152px;
-    border: 1px solid red;
-    /* border: 1px solid #bbb; */
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-    margin: 5px;
-    max-height: 100%;
-  }
-
-  .divFlex {
-    display: flex;
-  }
-
-  .divTxt {
-    font-size: 10px;
-    font-style: italic;
-    padding: 5px;
-    color: #999;
-    border: 0px solid green;
-  }
-
-  .divBtn {
-    align-items: stretch;
-    color: var(--blood-dark);
-    text-align: center;
-    font-size: 16px;
-    font-style: normal;
-    bottom: 0px;
-    border: 1px solid green;
   }
 
   .tc {
@@ -220,6 +192,82 @@
     border: 0px solid red;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 30px;
+  }
+
+  .dwrapper {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 0px;
+    grid-auto-rows: minmax(10px, auto);
+    width: 152px;
+    height: 35vh;
+    margin: 0 0 10px 10px;
+    text-align: center;
+    border: 1px solid #eee;
+  }
+  .done {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    text-align: center;
+    padding: 0px;
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    background-color: white;
+    border: 0px solid #999;
+  }
+  .dtwo {
+    grid-column: 1 / 1;
+    grid-row: 2;
+    border: 0px solid yellow;
+    font-size: 10px;
+    font-style: italic;
+    padding-left: 2px;
+    height: 20px;
+    color: #999;
+    text-align: left;
+  }
+  .dthree {
+    grid-column: 2/2;
+    grid-row: 2;
+    border: 0px solid yellow;
+    font-size: 10px;
+    font-style: italic;
+    height: 20px;
+    padding-right: 5px;
+    color: #999;
+    text-align: right;
+  }
+  .dfour {
+    grid-column: 1/3;
+    grid-row: 3;
+    border: 0px solid green;
+    font-size: 10px;
+    font-style: italic;
+    padding: 2px;
+    color: #999;
+    height: 20px;
+  }
+  .dfive {
+    grid-column: 1/3;
+    grid-row: 3;
+    border: 0px solid yellow;
+    color: var(--blood-dark);
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    bottom: 0px;
+    max-height: 20px;
+    padding-top: 0px;
+  }
+  .sep {
+    grid-column: 1/3;
+    grid-row: 2/4;
+    width: 150px;
+    border: 0px solid #999;
+    height: 40px;
   }
 </style>
 
@@ -237,7 +285,7 @@
 
       <!-- Nous avons ici notre label et l'input afférent -->
       <div class="dd">
-        <label for="file" class="label-file">Choisir une image</label>
+        <label for="file" class="label-file">Coose document(s)</label>
         <input
           id="file"
           class="input-file"
@@ -246,21 +294,15 @@
           on:change={listFiles} />
 
         <div id="pulp" class="pulp">
-
           {#each lstImgs as item, i}
-            <div class="divMaster">
-              <div class="tc">
+            <div id="doc_{i}" class="dwrapper">
+              <div class="done">
                 <img src={item.thumb} class="thumb" alt="" />
               </div>
-              <div class="divTxt divFlex">
-                <div class="tle">{item.type}</div>
-                <div class="tlr">{item.size}</div>
-              </div>
-              <div class="divTxt">
-                <div>name :</div>
-                <div>{item.nameori}</div>
-              </div>
-              <div class="divBtn">
+              <div class="sep" />
+              <div class="dtwo">{item.type}</div>
+              <div class="dthree">{item.size}</div>
+              <div class="dfive">
                 <a
                   href="#"
                   on:click|preventDefault={() => {
