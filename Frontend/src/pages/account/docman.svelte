@@ -9,8 +9,13 @@
   import "firebase/storage";
   import { uuid } from "uuidv4";
   // Your web app's Firebase configuration
+
   import firebaseConfig from "../configs/storage_gcp.js";
-  firebase.initializeApp(firebaseConfig);
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch (err) {
+    console.log(err.message);
+  }
 
   import { goto } from "@sveltech/routify";
   import _ from "lodash";
@@ -27,7 +32,6 @@
 
   let files = [];
   let lstImgs = [];
-  //let lstImgs2 = [];
   let proms = [];
 
   function listFiles(e) {
@@ -36,7 +40,7 @@
     if (e.target.files.length > 0) {
       [].forEach.call(e.target.files, readAndPreview);
     } else {
-      $: lstImgs = [];
+      //$: lstImgs = [];
       return;
     }
 
@@ -73,7 +77,7 @@
             }
 
             lstImgs.push({
-              //file: this.result,
+              fic: file,
               thumb: imgUrl,
               type: typ,
               size: (file.size / 1024 / 1024).toFixed(2).toString() + " Mo",
@@ -92,28 +96,12 @@
     Promise.all(proms)
       .then(() => {
         $: lstImgs = lstImgs;
+        console.log("lstImgs:", lstImgs);
         console.log("finish...");
       })
       .catch(e => {
         console.log(e);
       });
-  }
-
-  function _UploadLst() {
-    const fics = document.getElementById("file").files;
-    var storageRef = firebase.storage().ref();
-    fics.forEach(el => {
-      lstImgs.forEach((ff, i) => {
-        if (el.name === ff.nameori) {
-          const task = storageRef
-            .child("documents/" + ff.userid + "/" + ff.name)
-            .put(el);
-          task.then(sn => {
-            removeByName(ff.nameori);
-          });
-        }
-      });
-    });
   }
 
   function removeByName(kk) {
@@ -133,8 +121,20 @@
   }
 
   function UploadLst() {
-    const doc = document.getElementById("doc_0");
-    doc.className = "loader";
+    var storageRef = firebase.storage().ref();
+    lstImgs.forEach((ff, i) => {
+      const wr = document.getElementById("doc_" + i);
+      const ld = document.getElementById("load_" + i);
+      wr.style.display = "none";
+      ld.style.display = "block";
+      const task = storageRef
+        .child("documents/" + ff.userid + "/" + ff.name)
+        .put(ff.fic);
+      task.then(sn => {
+        //console.log("sn:", sn);
+        removeByName(ff.nameori);
+      });
+    });
   }
 </script>
 
@@ -195,6 +195,21 @@
     margin-top: 30px;
   }
 
+  .cloader {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 0px;
+    grid-auto-rows: minmax(10px, auto);
+    width: 152px;
+    height: 215px;
+    margin: 0 0 10px 10px;
+    border: 1px solid #eee;
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+  }
+
   .dwrapper {
     position: relative;
     display: grid;
@@ -202,7 +217,7 @@
     grid-gap: 0px;
     grid-auto-rows: minmax(10px, auto);
     width: 152px;
-    height: 35vh;
+    height: 215px;
     margin: 0 0 10px 10px;
     text-align: center;
     border: 1px solid #eee;
@@ -259,8 +274,9 @@
     font-size: 16px;
     font-style: normal;
     bottom: 0px;
-    max-height: 20px;
+    /* max-height: 20px; */
     padding-top: 0px;
+    align-self: self-end;
   }
   .sep {
     grid-column: 1/3;
@@ -268,6 +284,64 @@
     width: 150px;
     border: 0px solid #999;
     height: 40px;
+  }
+
+  /* Loader */
+  .lds-ellipsis {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    top: 67px;
+  }
+  .lds-ellipsis div {
+    position: absolute;
+    top: 33px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  }
+  .lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+  }
+  @keyframes lds-ellipsis1 {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes lds-ellipsis3 {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes lds-ellipsis2 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(24px, 0);
+    }
   }
 </style>
 
@@ -295,7 +369,15 @@
 
         <div id="pulp" class="pulp">
           {#each lstImgs as item, i}
-            <div id="doc_{i}" class="dwrapper">
+            <div id="load_{i}" class="cloader" style="display:none">
+              <div class="lds-ellipsis">
+                <div />
+                <div />
+                <div />
+                <div />
+              </div>
+            </div>
+            <div id="doc_{i}" class="dwrapper" style="display:grid">
               <div class="done">
                 <img src={item.thumb} class="thumb" alt="" />
               </div>
