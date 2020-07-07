@@ -38,6 +38,7 @@
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.10.1",
     "@firebase/app": "^0.6.6",
+    "@google-cloud/storage": "^5.1.1",
     "@hapi/joi": "^17.1.1",
     "@sveltech/routify": "^1.5.9",
     "@uppy/core": "^1.11.0",

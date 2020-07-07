@@ -104,9 +104,15 @@
       });
   }
 
-  function removeByName(kk) {
-    lstImgs.filter((zu, i) => {
-      if (zu.nameori === kk) {
+  function removeDoc(key) {
+    //console.log("lstImgs:", lstImgs.length);
+    lstImgs.splice(key, 1);
+    $: lstImgs = lstImgs;
+  }
+
+  async function removeByName(kk) {
+    await lstImgs.filter((zu, i) => {
+      if (zu.name === kk) {
         //console.log("i:", i);
         lstImgs.splice(i, 1);
         $: lstImgs = lstImgs;
@@ -114,26 +120,46 @@
     });
   }
 
-  function removeDoc(key) {
-    //console.log("lstImgs:", lstImgs.length);
-    lstImgs.splice(key, 1);
-    $: lstImgs = lstImgs;
+  function upfic(bb) {
+    return new Promise(function(resolve, reject) {
+      var storageRef = firebase.storage().ref();
+      try {
+        const task = storageRef
+          .child("documents/" + bb.userid + "/" + bb.name)
+          .put(bb.fic);
+        task.then(async sn => {
+          //console.log("sn:", sn.metadata.name);
+          //await removeByName(sn.metadata.name);
+          const ld = document.getElementById("load_" + sn.metadata.name);
+          ld.style.display = "none";
+          resolve(sn);
+        });
+      } catch (error) {
+        reject(error.message);
+      }
+    });
   }
 
-  function UploadLst() {
+  async function UploadLst() {
+    //cache le bouton upload
+    const bt = document.getElementById("BtnUpload");
+    bt.style.display = "none";
+    let proms = [];
     var storageRef = firebase.storage().ref();
-    lstImgs.forEach((ff, i) => {
-      const wr = document.getElementById("doc_" + i);
-      const ld = document.getElementById("load_" + i);
+    const mMax = lstImgs.length;
+    let nf = lstImgs;
+    for (let i = 0; i < mMax; i++) {
+      const wr = document.getElementById("doc_" + lstImgs[i].name);
+      const ld = document.getElementById("load_" + lstImgs[i].name);
       wr.style.display = "none";
       ld.style.display = "block";
-      const task = storageRef
-        .child("documents/" + ff.userid + "/" + ff.name)
-        .put(ff.fic);
-      task.then(sn => {
-        //console.log("sn:", sn);
-        removeByName(ff.nameori);
-      });
+      proms.push(await upfic(lstImgs[i]));
+    }
+
+    Promise.all(proms).then(e => {
+      //console.log("Finish all uploads...");
+      lstImgs = [];
+      $: lstImgs = lstImgs;
     });
   }
 </script>
@@ -359,7 +385,7 @@
 
       <!-- Nous avons ici notre label et l'input afférent -->
       <div class="dd">
-        <label for="file" class="label-file">Coose document(s)</label>
+        <label for="file" class="label-file">Choose document(s)</label>
         <input
           id="file"
           class="input-file"
@@ -369,7 +395,7 @@
 
         <div id="pulp" class="pulp">
           {#each lstImgs as item, i}
-            <div id="load_{i}" class="cloader" style="display:none">
+            <div id="load_{item.name}" class="cloader" style="display:none">
               <div class="lds-ellipsis">
                 <div />
                 <div />
@@ -377,7 +403,7 @@
                 <div />
               </div>
             </div>
-            <div id="doc_{i}" class="dwrapper" style="display:grid">
+            <div id="doc_{item.name}" class="dwrapper" style="display:grid">
               <div class="done">
                 <img src={item.thumb} class="thumb" alt="" />
               </div>
@@ -399,6 +425,7 @@
         {#if lstImgs.length > 0}
           <div style="margin-top: 30px">
             <input
+              id="BtnUpload"
               class="label-file"
               type="button"
               on:click={UploadLst}
