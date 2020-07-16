@@ -162,9 +162,25 @@
       $: lstImgs = lstImgs;
     });
   }
+
+  function showTabs(tb) {
+    //console.log(tb);
+    switch (tb) {
+      case "tab01":
+        document.getElementById("tab_upload").style.display = "block";
+        document.getElementById("tab_list").style.display = "none";
+        break;
+      case "tab02":
+        document.getElementById("tab_upload").style.display = "none";
+        document.getElementById("tab_list").style.display = "block";
+        break;
+    }
+  }
 </script>
 
 <style lang="scss">
+  @import "./src/pages/styles/account.scss";
+
   .pdt10 {
     padding-top: 10px;
   }
@@ -190,7 +206,7 @@
   }
 
   .dd {
-    margin-top: 20px;
+    margin-top: 50px;
     text-align: center;
   }
 
@@ -369,6 +385,34 @@
       transform: translate(24px, 0);
     }
   }
+
+  .bred {
+    border: 1px solid red;
+  }
+
+  .ptx {
+    padding-top: 50px;
+  }
+
+  .divTabs {
+    text-align: center;
+  }
+
+  .BtnTabs {
+    background-color: white;
+    cursor: pointer;
+    color: #2c3e50;
+    font-weight: bold;
+    border-radius: 0;
+    border: 2px solid #2c3e50;
+    padding: 15px;
+    width: 150px;
+  }
+
+  .BtnTabs:hover {
+    color: #597d91;
+    border: 2px solid #597d91;
+  }
 </style>
 
 <div>
@@ -376,16 +420,24 @@
     <Navbar Connect={isConnect} />
     <div class="mt50">
       <div class="text-left">
-        <h2
+        <h3
           class="page-section-heading text-secondary tle pdt10 mb-0
           d-inline-block">
-          Documents Manager
-        </h2>
+          <u>Documents Manager</u>
+        </h3>
+      </div>
+
+      <div class="divTabs ptx">
+        <button class="BtnTabs" on:click={() => showTabs('tab01')}>
+          Upload
+        </button>
+        <button class="BtnTabs" on:click={() => showTabs('tab02')}>List</button>
       </div>
 
       <!-- Nous avons ici notre label et l'input afférent -->
-      <div class="dd">
-        <label for="file" class="label-file">Choose document(s)</label>
+      <div id="tab_upload" class="dd">
+        <h3>Document(s) Upload</h3>
+        <label for="file" class="label-file mt25">Choose document(s)</label>
         <input
           id="file"
           class="input-file"
@@ -434,6 +486,11 @@
           </div>
         {/if}
       </div>
+
+      <div id="tab_list" class="dd" style="display: none">
+        <h3>Document(s) List</h3>
+      </div>
+
     </div>
   </div>
 </div>

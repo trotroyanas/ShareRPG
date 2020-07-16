@@ -80,17 +80,6 @@
   text-align: center;
 }
 
-.pdt25 {
-  padding-top: 25px;
-}
-
-.pdb25 {
-  padding-bottom: 25px;
-}
-
-.mg-top25 {
-  margin-top: 25px;
-}
 .mg-bot25 {
   margin-bottom: 25px;
 }
@@ -101,8 +90,10 @@
   border-bottom: solid 1px gray;
 }
 
-.mt30 {
-  margin-top: 30px;
+@for $i from 20 through 1 {
+  .mt#{$i*5} {
+    margin-top: #{$i * 5}px;
+  }
 }
 
 .btn-social {
@@ -112,11 +103,22 @@
   border-radius: 6px;
 }
 
-.pdt25 {
-  padding-top: 25px;
+@for $i from 20 through 1 {
+  .pdt#{$i*5} {
+    padding-top: #{$i * 25}px;
+  }
 }
-.pdb25 {
-  padding-bottom: 25px;
+
+@for $i from 20 through 1 {
+  .pdb#{$i*5} {
+    padding-bottom: #{$i * 25}px;
+  }
+}
+
+@for $i from 20 through 1 {
+  .w#{$i*25} {
+    width: #{$i * 25}px;
+  }
 }
 
 .google {
